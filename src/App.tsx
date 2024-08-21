@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom"
 import Menubar from "./Components/Menu-bar/Menubar"
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import "./App.css"
+import Header from "./Components/Header/Header";
 
 const App = () => {
 
@@ -10,6 +11,7 @@ const App = () => {
     
     return (
         <>
+            <Header/>
             <Menubar />
             <TransitionGroup component={null}>
                 <CSSTransition

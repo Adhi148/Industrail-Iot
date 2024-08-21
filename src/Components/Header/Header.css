@@ -1,0 +1,24 @@
+.header{
+    width: 100%;
+    padding: 20px 0px;
+    display: flex;
+    gap: 25px;
+    background-color: #6c3;
+    box-shadow: 0px 0 10px rgb(31, 89, 2);
+    z-index: 200;
+    position: relative;
+}
+.link2{
+    color: white !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo{
+    width: 275px;
+    color: orangered;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

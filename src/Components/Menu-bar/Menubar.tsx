@@ -5,7 +5,7 @@ import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import CableIcon from '@mui/icons-material/Cable';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import GroupIcon from '@mui/icons-material/Group';
-import { useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import AddToQueueIcon from '@mui/icons-material/AddToQueue';
 import AddIcon from '@mui/icons-material/Add';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
@@ -15,13 +15,6 @@ import AddLocationIcon from '@mui/icons-material/AddLocation';
 import { useEffect } from "react";
 
 const Menubar = () => {
-
-    const { pathname } = useLocation();
-
-
-    useEffect(() => {
-        window.scrollTo(0,0)
-    }, [pathname]);
 
     useEffect(() => {
         document.body.style.overflowX = 'hidden';

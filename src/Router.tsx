@@ -15,79 +15,80 @@ import Addwarehouse from "./Components/Add-Warehouse/Addwarehouse";
 import Adduser from "./Components/Add-User/Adduser";
 import Addvehicle from "./Components/Add-Vehicle/Addvehicle";
 import MyComponent from "./Components/MyComponent/MyComponent";
+import Login from "./Components/Login/Login";
+import PrivateRoute from './Components/PrivateRoute';
 
+const Router = createBrowserRouter([
+    {
+        path: '/',
+        element: <PrivateRoute element={<App />} />,
+        children: [
+            {
+                path: '/dashboard',
+                element: <Dashboard />,
+            },
+            {
+                path: '/charts',
+                element: <Charts />,
+            },
+            {
+                path: '/actions',
+                element: <Actions />,
+            },
+            {
+                path: '/devices',
+                element: <Devices />,
+            },
+            {
+                path: '/locations',
+                element: <Locations />,
+            },
+            {
+                path: '/users',
+                element: <Users />,
+            },
+            {
+                path: '/addDevice',
+                element: <AddDevice />,
+            },
+            {
+                path: '/warehouses',
+                element: <Warehouse />,
+            },
+            {
+                path: '/vehicles',
+                element: <Vehicles />,
+            },
+            {
+                path: '/addAction',
+                element: <AddAction />,
+            },
+            {
+                path: '/addLocation',
+                element: <AddLocation />,
+            },
+            {
+                path: '/addWarehouse',
+                element: <Addwarehouse />,
+            },
+            {
+                path: '/addUser',
+                element: <Adduser />,
+            },
+            {
+                path: '/addVehicle',
+                element: <Addvehicle />,
+            },
+            {
+                path: '/testComponent',
+                element: <MyComponent />,
+            }
+        ]
+    },
+    {
+        path: '/login',
+        element: <Login />,
+    }
+]);
 
-const Router = createBrowserRouter
-(
-    [
-        {
-            path : '/' ,
-            element : <App/>,
-            children : 
-            [
-                {
-                    path: '/dashboard' ,
-                    element : <Dashboard/>
-                } ,
-                {
-                    path: '/charts' ,
-                    element : <Charts/>
-                },
-                {
-                    path: '/actions',
-                    element: <Actions />
-                },
-                {
-                    path: '/devices',
-                    element: <Devices />
-                },
-                {
-                    path: '/locations',
-                    element: <Locations />
-                },
-                {
-                    path: '/users',
-                    element: <Users/>
-                },
-                {
-                    path: '/addDevice',
-                    element: <AddDevice/>
-                },
-                {
-                    path: '/warehouses',
-                    element: <Warehouse/>
-                },
-                {
-                    path: '/vehicles',
-                    element: <Vehicles/>
-                },
-                {
-                    path: '/addAction',
-                    element: <AddAction/>
-                },
-                {
-                    path: '/addLocation',
-                    element: <AddLocation/>
-                },
-                {
-                    path: '/addWarehouse',
-                    element: <Addwarehouse/>
-                },
-                {
-                    path:'/addUser',
-                    element: <Adduser/>
-                },
-                {
-                    path:'/addVehicle',
-                    element: <Addvehicle/>
-                },
-                {
-                    path:'/testComponent',
-                    element: <MyComponent />
-                }
-            ]
-        }
-    ]
-)
-
-export default Router
+export default Router;
