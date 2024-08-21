@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Device, Dashboard } from '../../types/thingsboardTypes';
 import { login, logout } from '../../api/loginApi';
-import { getCustomerDevices, saveDevice } from '../../api/deviceApi';
+import { generateDeviceId, getAllDevices, getCustomerDevices, saveDevice } from '../../api/deviceApi';
 import { getCustomerDashboards } from '../../api/dashboardApi';
 
 const MyComponent: React.FC = () => {
@@ -22,8 +22,7 @@ const MyComponent: React.FC = () => {
   const [loadingDevices, setLoadingDevices] = useState<boolean>(true);
   const [loadingDashboards, setLoadingDashboards] = useState<boolean>(true);
 
-  // Customer ID for testing
-  const customerId = 'example-customer-id'; // Replace with an actual customer ID if needed
+
 
   // Handle login
   const handleLogin = async () => {
@@ -31,8 +30,8 @@ const MyComponent: React.FC = () => {
       await login(username, password);
       alert('Login successful!');
       setLoginError(null);
-      fetchDevices();
-      fetchDashboards();
+      // fetchDevices();
+      // fetchDashboards();
     } catch (error) {
       setLoginError('Login failed');
     }
@@ -47,7 +46,9 @@ const MyComponent: React.FC = () => {
   // Handle device creation
   const handleCreateDevice = async () => {
     try {
-      const newDevice: Device = { id: '', name: deviceName, type: deviceType };
+      const newDevice: Device = { 
+        name: deviceName, 
+        type: deviceType };
       await saveDevice(newDevice);
       setDeviceName('');
       setDeviceType('');
@@ -62,7 +63,7 @@ const MyComponent: React.FC = () => {
   const fetchDevices = async () => {
     try {
       setLoadingDevices(true);
-      const data = await getCustomerDevices(customerId);
+      const data = await getAllDevices("SELECT * FROM device;");
       setDevices(data);
     } catch (error) {
       console.error('Failed to fetch devices', error);
@@ -86,7 +87,7 @@ const MyComponent: React.FC = () => {
 
   useEffect(() => {
     fetchDevices();
-    fetchDashboards();
+    // fetchDashboards();
   }, []);
 
   return (
