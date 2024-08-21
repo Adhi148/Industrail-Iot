@@ -1,3 +1,6 @@
+
+import { Outlet } from "react-router-dom"
+import MyComponent from "./Components/MyComponent"
 import { Outlet, useLocation } from "react-router-dom"
 import Menubar from "./Components/Menu-bar/Menubar"
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -9,6 +12,8 @@ const App = () => {
     
     return (
         <>
+            <Outlet/>
+            <MyComponent />
             <Menubar />
             <TransitionGroup component={null}>
                 <CSSTransition
