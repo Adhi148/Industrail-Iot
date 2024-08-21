@@ -23,6 +23,13 @@ const Menubar = () => {
         window.scrollTo(0,0)
     }, [pathname]);
 
+    useEffect(() => {
+        document.body.style.overflowX = 'hidden';
+        return () => {
+            document.body.style.overflowX = '';
+        };
+    }, []);
+
     return (
         <>
             <div className="side-bar">
