@@ -6,6 +6,7 @@
     transition: width 0.3s ease, transform 0.3s ease;
     z-index: 100;
     position: relative;
+
 }
 
 .Menu{

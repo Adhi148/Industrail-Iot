@@ -14,6 +14,7 @@ import AddLocation from "./Components/Add-Location/AddLocation";
 import Addwarehouse from "./Components/Add-Warehouse/Addwarehouse";
 import Adduser from "./Components/Add-User/Adduser";
 import Addvehicle from "./Components/Add-Vehicle/Addvehicle";
+import MyComponent from "./Components/MyComponent/MyComponent";
 
 
 const Router = createBrowserRouter
@@ -79,6 +80,10 @@ const Router = createBrowserRouter
                 {
                     path:'/addVehicle',
                     element: <Addvehicle/>
+                },
+                {
+                    path:'/testComponent',
+                    element: <MyComponent />
                 }
             ]
         }

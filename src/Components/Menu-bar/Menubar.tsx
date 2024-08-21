@@ -73,6 +73,9 @@ const Menubar = () => {
                     <Link to="/addUser" className="link">
                         <li><PersonAddAlt1Icon className="speedicon" />Add User</li>
                     </Link>
+                    <Link to="/testComponent" className="link">
+                        <li><PersonAddAlt1Icon className="speedicon" />My Component</li>
+                    </Link>
                 </ul>
             </div>
         </>
