@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
-
-import { Device, Dashboard } from '../../types/thingsboardTypes';
+import React, { useEffect, useState } from 'react';
+import {
+  Device,
+  Dashboard,
+  DeviceQueryParams,
+} from '../../types/thingsboardTypes';
 import { login, logout } from '../../api/loginApi';
-import { generateDeviceId, getAllDevices, getCustomerDevices, saveDevice } from '../../api/deviceApi';
-import { getCustomerDashboards } from '../../api/dashboardApi';
+import { getTenantDevices, saveDevice } from '../../api/deviceApi';
+import { saveDashboard } from '../../api/dashboardApi'; // Ensure you have this API function
 
 const MyComponent: React.FC = () => {
   // State for login
@@ -16,13 +19,15 @@ const MyComponent: React.FC = () => {
   const [deviceType, setDeviceType] = useState<string>('');
   const [deviceError, setDeviceError] = useState<string | null>(null);
 
-  // State for device and dashboard lists
+  // State for dashboard creation
+  const [dashboardTitle, setDashboardTitle] = useState<string>('');
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
+
+  // State for devices
   const [devices, setDevices] = useState<Device[]>([]);
-  const [dashboards, setDashboards] = useState<Dashboard[]>([]);
-  const [loadingDevices, setLoadingDevices] = useState<boolean>(true);
-  const [loadingDashboards, setLoadingDashboards] = useState<boolean>(true);
-
-
+  const [loadingDevices, setLoadingDevices] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   // Handle login
   const handleLogin = async () => {
@@ -30,8 +35,6 @@ const MyComponent: React.FC = () => {
       await login(username, password);
       alert('Login successful!');
       setLoginError(null);
-      // fetchDevices();
-      // fetchDashboards();
     } catch (error) {
       setLoginError('Login failed');
     }
@@ -46,25 +49,52 @@ const MyComponent: React.FC = () => {
   // Handle device creation
   const handleCreateDevice = async () => {
     try {
-      const newDevice: Device = { 
-        name: deviceName, 
-        type: deviceType };
+      const newDevice: Device = {
+        name: deviceName,
+        type: deviceType,
+      };
       await saveDevice(newDevice);
       setDeviceName('');
       setDeviceType('');
       alert('Device created successfully!');
-      fetchDevices();
+      fetchDevices(); // Optionally refetch devices
     } catch (error) {
       setDeviceError('Failed to create device');
     }
   };
 
+  // Handle dashboard creation
+  const handleCreateDashboard = async () => {
+    try {
+      const newDashboard: Dashboard = {
+        title: dashboardTitle,
+      };
+      await saveDashboard(newDashboard);
+      setDashboardTitle('');
+      alert('Dashboard created successfully!');
+      // fetchDashboards(); // Optionally refetch dashboards
+    } catch (error) {
+      setDashboardError('Failed to create dashboard');
+    }
+  };
+
   // Fetch devices
-  const fetchDevices = async () => {
+  const fetchDevices = async (page: number) => {
     try {
       setLoadingDevices(true);
-      const data = await getAllDevices("SELECT * FROM device;");
-      setDevices(data);
+
+      const params: DeviceQueryParams = {
+        pageSize: 10, // Adjust as needed
+        page: page,
+        type: 'default', // Adjust as needed or remove if not filtering by type
+        textSearch: '', // Adjust as needed or remove if not searching
+        sortProperty: 'name', // Adjust as needed or remove if not sorting
+        sortOrder: 'ASC', // Adjust as needed or remove if not sorting
+      };
+
+      const data: PageData<Device> = await getTenantDevices(params);
+      setDevices(data.data);
+      setTotalPages(data.totalPages);
     } catch (error) {
       console.error('Failed to fetch devices', error);
     } finally {
@@ -72,26 +102,16 @@ const MyComponent: React.FC = () => {
     }
   };
 
-  // Fetch dashboards
-  const fetchDashboards = async () => {
-    try {
-      setLoadingDashboards(true);
-      const data = await getCustomerDashboards(customerId);
-      setDashboards(data);
-    } catch (error) {
-      console.error('Failed to fetch dashboards', error);
-    } finally {
-      setLoadingDashboards(false);
-    }
+  useEffect(() => {
+    fetchDevices(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
-  useEffect(() => {
-    fetchDevices();
-    // fetchDashboards();
-  }, []);
-
   return (
-    <div  className="menu-data">
+    <div className="menu-data">
       <h1>MyComponent</h1>
 
       {/* Login Form */}
@@ -133,31 +153,51 @@ const MyComponent: React.FC = () => {
         {deviceError && <p>{deviceError}</p>}
       </div>
 
+      {/* Create Dashboard */}
+      <div>
+        <h2>Create Dashboard</h2>
+        <input
+          type="text"
+          value={dashboardTitle}
+          onChange={(e) => setDashboardTitle(e.target.value)}
+          placeholder="Dashboard Title"
+        />
+        <button onClick={handleCreateDashboard}>Create Dashboard</button>
+        {dashboardError && <p>{dashboardError}</p>}
+      </div>
+
       {/* Devices List */}
       <div>
         <h2>Devices</h2>
         {loadingDevices ? (
           <p>Loading devices...</p>
         ) : (
-          <ul>
-            {devices.map((device) => (
-              <li key={device.id}>{device.name} ({device.type})</li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* Dashboards List */}
-      <div>
-        <h2>Dashboards</h2>
-        {loadingDashboards ? (
-          <p>Loading dashboards...</p>
-        ) : (
-          <ul>
-            {dashboards.map((dashboard) => (
-              <li key={dashboard.id}>{dashboard.title}</li>
-            ))}
-          </ul>
+          <>
+            <ul>
+              {devices.map((device, index) => (
+                <li key={index}>
+                  {device.name} ({device.type})
+                </li>
+              ))}
+            </ul>
+            <div>
+              <button
+                disabled={currentPage === 0}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                Previous
+              </button>
+              <span>
+                Page {currentPage + 1} of {totalPages}
+              </span>
+              <button
+                disabled={currentPage >= totalPages - 1}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>

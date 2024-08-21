@@ -1,5 +1,5 @@
 import thingsboardAPI from './thingsboardAPI';
-import { Device } from '../types/thingsboardTypes';
+import { Device, DeviceQueryParams, PageData } from '../types/thingsboardTypes';
 
 // Assign device to customer
 export const assignDeviceToCustomer = async (
@@ -273,10 +273,10 @@ export const getTenantDevice = async (deviceName: string): Promise<Device> => {
 
 // Get Tenant Devices
 export const getTenantDevices = async (
-  params?: { pageSize?: number; page?: number; type?: string; textSearch?: string; sortProperty?: string; sortOrder?: string }
-): Promise<Device[]> => {
+  params: DeviceQueryParams
+): Promise<PageData<Device>> => {
   try {
-    const response = await thingsboardAPI.get(`/tenant/devices`, { params });
+    const response = await thingsboardAPI.get('/tenant/devices', { params });
     return response.data;
   } catch (error) {
     console.error('Failed to get tenant devices', error);
