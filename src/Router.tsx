@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
+import Main from "./Components/Main";
 
 const Router = createBrowserRouter
 (
@@ -11,7 +12,7 @@ const Router = createBrowserRouter
             [
                 {
                     path : "/",
-                    element : <App/>
+                    element : <Main/>
                 }
             ]
         }
