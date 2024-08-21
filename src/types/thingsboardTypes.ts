@@ -10,14 +10,14 @@ export interface Device {
 
 // Device Profile types
 export interface DeviceProfile {
-  id: string;
+  id?: string;
   name: string;
   description?: string; // Optional: Description of the device profile
 }
 
 // Dashboard types
 export interface Dashboard {
-  id: string;
+  id?: string;
   title: string;
   description?: string; // Optional: Description of the dashboard
   createdTime?: string; // Optional: ISO 8601 format
@@ -25,7 +25,7 @@ export interface Dashboard {
 }
 
 export interface DashboardInfo {
-  id: string;
+  id?: string;
   title: string;
   description?: string;
   createdTime?: string;
@@ -34,15 +34,31 @@ export interface DashboardInfo {
 
 // Widget types
 export interface Widget {
-  id: string;
+  id?: string;
   type: string;
   title?: string; // Optional: Title of the widget
   configuration?: any; // Optional: Widget-specific configuration
 }
 
 export interface WidgetConfig {
-  id: string;
+  id?: string;
   type: string;
   settings?: any; // Optional: Settings for the widget
   layout?: any; // Optional: Layout configuration for the widget
+}
+
+export interface DeviceQueryParams {
+  pageSize: number;
+  page: number;
+  type?: string;
+  textSearch?: string;
+  sortProperty?: 'createdTime' | 'name' | 'deviceProfileName' | 'label' | 'customerTitle';
+  sortOrder?: 'ASC' | 'DESC';
+}
+
+export interface PageData<T> {
+  data: T[];
+  totalPages: number;
+  totalElements: number;
+  hasNext: boolean;
 }
