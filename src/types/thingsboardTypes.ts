@@ -1,6 +1,6 @@
 // Device types
 export interface Device {
-  id: string;
+  id?: string;
   name: string;
   type: string;
   label?: string; // Optional: A user-friendly label for the device
