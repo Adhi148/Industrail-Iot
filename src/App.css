@@ -1,0 +1,41 @@
+@keyframes slideIn {
+    from {
+        transform: translateX(30%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+.page-enter {
+    animation: slideIn 0.5s forwards;
+}
+
+.page-exit {
+    animation: slideOut 0.5s forwards;
+}
+
+.menu-data {
+    border: 1px solid black;
+    position: absolute;
+    left: 275px;
+    width: calc(100% - 275px);
+    top: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+}
