@@ -1,8 +1,9 @@
 .side-bar {
-    height: 100vh;
+    height: calc(100vh - 65px);
     width: 275px;
     border-right: 1px solid rgba(0, 0, 0, 0.2);
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
     transition: width 0.3s ease, transform 0.3s ease;
     z-index: 100;
     position: relative;
