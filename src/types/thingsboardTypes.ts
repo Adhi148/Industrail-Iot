@@ -87,8 +87,8 @@ export interface UserSettings {
 }
 
 export interface MobileSessionData {
-  sessionId?: string;
-  token?: string;
-  createdTime?: number;
-  lastUpdateTime?: number;
+  data: T[]; // Assuming data is always present
+  totalPages: number;
+  totalElements: number;
+  hasNext: boolean;
 }

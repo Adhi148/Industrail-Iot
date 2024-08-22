@@ -12,6 +12,7 @@ import { getTenantDevices, saveDevice } from '../../api/deviceApi';
 import { getTenantDashboards, saveDashboard } from '../../api/dashboardApi';
 import { getUsers, saveUser } from '../../api/userApi';
 
+
 const MyComponent: React.FC = () => {
   // State for login
   const [username, setUsername] = useState<string>('');
@@ -59,8 +60,8 @@ const MyComponent: React.FC = () => {
       await login(username, password);
       alert('Login successful!');
       setLoginError(null);
-    } catch (error) {
-      setLoginError('Login failed');
+    } catch (error: any) {
+      setLoginError(error.message || 'Login failed');
     }
   };
 
@@ -126,12 +127,12 @@ const MyComponent: React.FC = () => {
       setLoadingDevices(true);
 
       const params: DeviceQueryParams = {
-        pageSize: 10, // Adjust as needed
+        pageSize: 10,
         page: page,
-        type: 'default', // Adjust as needed or remove if not filtering by type
-        textSearch: '', // Adjust as needed or remove if not searching
-        sortProperty: 'name', // Adjust as needed or remove if not sorting
-        sortOrder: 'ASC', // Adjust as needed or remove if not sorting
+        type: 'default',
+        textSearch: '',
+        sortProperty: 'name',
+        sortOrder: 'ASC',
       };
 
       const data: PageData<Device> = await getTenantDevices(params);
