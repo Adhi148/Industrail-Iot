@@ -4,14 +4,14 @@ import {
   Dashboard,
   User,
   DeviceQueryParams,
-  DashboardQueryParams,
   PageData,
+  DashboardQueryParams,
 } from '../../types/thingsboardTypes';
 import { login, logout } from '../../api/loginApi';
 import { getTenantDevices, saveDevice } from '../../api/deviceApi';
 import { getTenantDashboards, saveDashboard } from '../../api/dashboardApi';
 import { getUsers, saveUser } from '../../api/userApi';
-
+import { getAllWidgetsBundles, getWidgetsBundles } from '../../api/widgetsBundleAPI';
 
 const MyComponent: React.FC = () => {
   // State for login
@@ -52,8 +52,50 @@ const MyComponent: React.FC = () => {
   const [currentPageUsers, setCurrentPageUsers] = useState<number>(0);
   const [totalPagesUsers, setTotalPagesUsers] = useState<number>(0);
 
+  // State for widget bundles
+  const [widgetBundles, setWidgetBundles] = useState<any[]>([]);
+  const [loadingWidgetBundles, setLoadingWidgetBundles] =
+    useState<boolean>(false);
+  const [currentPageWidgetBundles, setCurrentPageWidgetBundles] =
+    useState<number>(0);
+  const [totalPagesWidgetBundles, setTotalPagesWidgetBundles] =
+    useState<number>(0);
 
-  console.log(devices)
+  // Fetch widget bundles with parameters
+  const fetchWidgetBundles = async (page: number) => {
+    try {
+      setLoadingWidgetBundles(true);
+
+      const bundles = await getAllWidgetsBundles();
+      // const bundleswithpage = await getWidgetsBundles(10, 0, 'searchText', 'name', 'ASC', true, false);
+      console.log(bundles)
+      setWidgetBundles(bundles || []);
+      // setTotalPagesWidgetBundles(bundles.totalPages || 0);
+    } catch (error) {
+      console.error('Failed to fetch widget bundles', error);
+    } finally {
+      setLoadingWidgetBundles(false);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchDevices(currentPageDevices);
+    fetchDashboards(currentPageDashboards);
+    fetchUsers(currentPageUsers);
+    fetchWidgetBundles(currentPageWidgetBundles); // Fetch widget bundles on component mount
+  }, [
+    currentPageDevices,
+    currentPageDashboards,
+    currentPageUsers,
+    currentPageWidgetBundles,
+  ]);
+
+  // Handle pagination for widget bundles
+  const handlePageChangeWidgetBundles = (page: number) => {
+    setCurrentPageWidgetBundles(page);
+  };
+
   // Handle login
   const handleLogin = async () => {
     try {
@@ -207,9 +249,22 @@ const MyComponent: React.FC = () => {
     setCurrentPageUsers(page);
   };
 
+  const handleGetAll = () => {
+    fetchDevices(currentPageDevices);
+    fetchDashboards(currentPageDashboards);
+    fetchUsers(currentPageUsers);
+    fetchWidgetBundles(currentPageWidgetBundles);
+
+    console.log(devices)
+    console.log(dashboards)
+    console.log(users)
+    console.log(widgetBundles)
+  }
+
   return (
-    <div className="menu-data">
+    <div className="menu-data" style={{padding: "10px"}}>
       <h1>MyComponent</h1>
+      <button onClick={handleGetAll} >Get Data</button>
 
       {/* Login Form */}
       <div>
@@ -297,17 +352,25 @@ const MyComponent: React.FC = () => {
           <p>Loading devices...</p>
         ) : (
           <ul>
-            {devices.map((device) => (
-              <li key={device.id}>{device.name}</li>
+            {devices.map((device, index) => (
+              <li key={index}>{device.name}</li>
             ))}
           </ul>
         )}
         {/* Pagination */}
-        <button onClick={() => handlePageChangeDevices(currentPageDevices - 1)} disabled={currentPageDevices <= 0}>
+        <button
+          onClick={() => handlePageChangeDevices(currentPageDevices - 1)}
+          disabled={currentPageDevices <= 0}
+        >
           Previous
         </button>
-        <span>{currentPageDevices + 1} / {totalPagesDevices}</span>
-        <button onClick={() => handlePageChangeDevices(currentPageDevices + 1)} disabled={currentPageDevices >= totalPagesDevices - 1}>
+        <span>
+          {currentPageDevices + 1} / {totalPagesDevices}
+        </span>
+        <button
+          onClick={() => handlePageChangeDevices(currentPageDevices + 1)}
+          disabled={currentPageDevices >= totalPagesDevices - 1}
+        >
           Next
         </button>
       </div>
@@ -319,17 +382,25 @@ const MyComponent: React.FC = () => {
           <p>Loading dashboards...</p>
         ) : (
           <ul>
-            {dashboards.map((dashboard) => (
-              <li key={dashboard.id}>{dashboard.title}</li>
+            {dashboards.map((dashboard, index) => (
+              <li key={index}>{dashboard.title}</li>
             ))}
           </ul>
         )}
         {/* Pagination */}
-        <button onClick={() => handlePageChangeDashboards(currentPageDashboards - 1)} disabled={currentPageDashboards <= 0}>
+        <button
+          onClick={() => handlePageChangeDashboards(currentPageDashboards - 1)}
+          disabled={currentPageDashboards <= 0}
+        >
           Previous
         </button>
-        <span>{currentPageDashboards + 1} / {totalPagesDashboards}</span>
-        <button onClick={() => handlePageChangeDashboards(currentPageDashboards + 1)} disabled={currentPageDashboards >= totalPagesDashboards - 1}>
+        <span>
+          {currentPageDashboards + 1} / {totalPagesDashboards}
+        </span>
+        <button
+          onClick={() => handlePageChangeDashboards(currentPageDashboards + 1)}
+          disabled={currentPageDashboards >= totalPagesDashboards - 1}
+        >
           Next
         </button>
       </div>
@@ -341,20 +412,63 @@ const MyComponent: React.FC = () => {
           <p>Loading users...</p>
         ) : (
           <ul>
-            {users.map((user) => (
-              <li key={user.id}>{user.username}</li>
+            {users.map((user, index) => (
+              <li key={index}>{user.username}</li>
             ))}
           </ul>
         )}
         {/* Pagination */}
-        <button onClick={() => handlePageChangeUsers(currentPageUsers - 1)} disabled={currentPageUsers <= 0}>
+        <button
+          onClick={() => handlePageChangeUsers(currentPageUsers - 1)}
+          disabled={currentPageUsers <= 0}
+        >
           Previous
         </button>
-        <span>{currentPageUsers + 1} / {totalPagesUsers}</span>
-        <button onClick={() => handlePageChangeUsers(currentPageUsers + 1)} disabled={currentPageUsers >= totalPagesUsers - 1}>
+        <span>
+          {currentPageUsers + 1} / {totalPagesUsers}
+        </span>
+        <button
+          onClick={() => handlePageChangeUsers(currentPageUsers + 1)}
+          disabled={currentPageUsers >= totalPagesUsers - 1}
+        >
           Next
         </button>
       </div>
+
+      {/* Widget Bundles List */}
+      <div>
+        <h2>Widget Bundles</h2>
+        {loadingWidgetBundles ? (
+          <p>Loading widget bundles...</p>
+        ) : (
+          <ul>
+            {widgetBundles.map((bundle, index) => (
+              <li key={index}>{bundle.name}</li>
+            ))}
+          </ul>
+        )}
+        {/* Pagination */}
+        <button
+          onClick={() =>
+            handlePageChangeWidgetBundles(currentPageWidgetBundles - 1)
+          }
+          disabled={currentPageWidgetBundles <= 0}
+        >
+          Previous
+        </button>
+        <span>
+          {currentPageWidgetBundles + 1} / {totalPagesWidgetBundles}
+        </span>
+        <button
+          onClick={() =>
+            handlePageChangeWidgetBundles(currentPageWidgetBundles + 1)
+          }
+          disabled={currentPageWidgetBundles >= totalPagesWidgetBundles - 1}
+        >
+          Next
+        </button>
+      </div>
+      
     </div>
   );
 };

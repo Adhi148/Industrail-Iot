@@ -1,4 +1,4 @@
-import { Dashboard, PageData } from '../../types/thingsboardTypes';
+import { Dashboard, PageData } from '../types/thingsboardTypes';
 import thingsboardAPI from './thingsboardAPI';
 
 
