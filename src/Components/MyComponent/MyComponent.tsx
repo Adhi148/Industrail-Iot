@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import {
   Device,
   Dashboard,
+  User,
   DeviceQueryParams,
-  PageData
+  DashboardQueryParams,
+  PageData,
 } from '../../types/thingsboardTypes';
 import { login, logout } from '../../api/loginApi';
 import { getTenantDevices, saveDevice } from '../../api/deviceApi';
-import { saveDashboard } from '../../api/dashboardApi';
+import { getTenantDashboards, saveDashboard } from '../../api/dashboardApi';
+import { getUsers, saveUser } from '../../api/userApi';
+
 
 const MyComponent: React.FC = () => {
   // State for login
@@ -24,12 +28,32 @@ const MyComponent: React.FC = () => {
   const [dashboardTitle, setDashboardTitle] = useState<string>('');
   const [dashboardError, setDashboardError] = useState<string | null>(null);
 
+  // State for user creation
+  const [newUsername, setNewUsername] = useState<string>('');
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [sendActivationMail, setSendActivationMail] = useState<boolean>(true);
+  const [userError, setUserError] = useState<string | null>(null);
+
   // State for devices
   const [devices, setDevices] = useState<Device[]>([]);
   const [loadingDevices, setLoadingDevices] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(0);
+  const [currentPageDevices, setCurrentPageDevices] = useState<number>(0);
+  const [totalPagesDevices, setTotalPagesDevices] = useState<number>(0);
 
+  // State for dashboards
+  const [dashboards, setDashboards] = useState<Dashboard[]>([]);
+  const [loadingDashboards, setLoadingDashboards] = useState<boolean>(false);
+  const [currentPageDashboards, setCurrentPageDashboards] = useState<number>(0);
+  const [totalPagesDashboards, setTotalPagesDashboards] = useState<number>(0);
+
+  // State for users
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState<boolean>(false);
+  const [currentPageUsers, setCurrentPageUsers] = useState<number>(0);
+  const [totalPagesUsers, setTotalPagesUsers] = useState<number>(0);
+
+
+  console.log(devices)
   // Handle login
   const handleLogin = async () => {
     try {
@@ -58,9 +82,9 @@ const MyComponent: React.FC = () => {
       setDeviceName('');
       setDeviceType('');
       alert('Device created successfully!');
-      fetchDevices(1); // Optionally refetch devices
-    } catch (error: any) {
-      setDeviceError(error.message || 'Failed to create device');
+      fetchDevices(currentPageDevices); // Optionally refetch devices
+    } catch (error) {
+      setDeviceError('Failed to create device');
     }
   };
 
@@ -73,8 +97,27 @@ const MyComponent: React.FC = () => {
       await saveDashboard(newDashboard);
       setDashboardTitle('');
       alert('Dashboard created successfully!');
-    } catch (error: any) {
-      setDashboardError(error.message || 'Failed to create dashboard');
+      fetchDashboards(currentPageDashboards); // Optionally refetch dashboards
+    } catch (error) {
+      setDashboardError('Failed to create dashboard');
+    }
+  };
+
+  // Handle user creation
+  const handleCreateUser = async () => {
+    try {
+      const newUser: User = {
+        username: newUsername,
+        password: newPassword,
+        // Add other required fields here
+      };
+      await saveUser(newUser, sendActivationMail);
+      setNewUsername('');
+      setNewPassword('');
+      alert('User created successfully!');
+      fetchUsers(currentPageUsers); // Optionally refetch users
+    } catch (error) {
+      setUserError('Failed to create user');
     }
   };
 
@@ -94,7 +137,7 @@ const MyComponent: React.FC = () => {
 
       const data: PageData<Device> = await getTenantDevices(params);
       setDevices(data.data);
-      setTotalPages(data.totalPages);
+      setTotalPagesDevices(data.totalPages);
     } catch (error) {
       console.error('Failed to fetch devices', error);
     } finally {
@@ -102,12 +145,66 @@ const MyComponent: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchDevices(currentPage);
-  }, [currentPage]);
+  // Fetch dashboards
+  const fetchDashboards = async (page: number) => {
+    try {
+      setLoadingDashboards(true);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+      const params: DashboardQueryParams = {
+        pageSize: 10, // Adjust as needed
+        page: page,
+        textSearch: '', // Adjust as needed or remove if not searching
+        sortProperty: 'title', // Adjust as needed or remove if not sorting
+        sortOrder: 'ASC', // Adjust as needed or remove if not sorting
+      };
+
+      const data: PageData<Dashboard> = await getTenantDashboards(params);
+      setDashboards(data.data);
+      setTotalPagesDashboards(data.totalPages);
+    } catch (error) {
+      console.error('Failed to fetch dashboards', error);
+    } finally {
+      setLoadingDashboards(false);
+    }
+  };
+
+  // Fetch users
+  const fetchUsers = async (page: number) => {
+    try {
+      setLoadingUsers(true);
+      const response: PageData<User> = await getUsers(page);
+      setUsers(response.data || []);
+      setTotalPagesUsers(response.totalPages || 0);
+    } catch (error) {
+      console.error('Failed to fetch users', error);
+      setUserError('Failed to fetch users');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDevices(currentPageDevices);
+  }, [currentPageDevices]);
+
+  useEffect(() => {
+    fetchDashboards(currentPageDashboards);
+  }, [currentPageDashboards]);
+
+  useEffect(() => {
+    fetchUsers(currentPageUsers);
+  }, [currentPageUsers]);
+
+  const handlePageChangeDevices = (page: number) => {
+    setCurrentPageDevices(page);
+  };
+
+  const handlePageChangeDashboards = (page: number) => {
+    setCurrentPageDashboards(page);
+  };
+
+  const handlePageChangeUsers = (page: number) => {
+    setCurrentPageUsers(page);
   };
 
   return (
@@ -166,39 +263,97 @@ const MyComponent: React.FC = () => {
         {dashboardError && <p>{dashboardError}</p>}
       </div>
 
+      {/* Create User */}
+      <div>
+        <h2>Create User</h2>
+        <input
+          type="text"
+          value={newUsername}
+          onChange={(e) => setNewUsername(e.target.value)}
+          placeholder="Username"
+        />
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          placeholder="Password"
+        />
+        <label>
+          <input
+            type="checkbox"
+            checked={sendActivationMail}
+            onChange={(e) => setSendActivationMail(e.target.checked)}
+          />
+          Send Activation Mail
+        </label>
+        <button onClick={handleCreateUser}>Create User</button>
+        {userError && <p>{userError}</p>}
+      </div>
+
       {/* Devices List */}
       <div>
         <h2>Devices</h2>
         {loadingDevices ? (
           <p>Loading devices...</p>
         ) : (
-          <>
-            <ul>
-              {devices.map((device, index) => (
-                <li key={index}>
-                  {device.name} ({device.type})
-                </li>
-              ))}
-            </ul>
-            <div>
-              <button
-                disabled={currentPage === 0}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </button>
-              <span>
-                Page {currentPage + 1} of {totalPages}
-              </span>
-              <button
-                disabled={currentPage >= totalPages - 1}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </button>
-            </div>
-          </>
+          <ul>
+            {devices.map((device) => (
+              <li key={device.id}>{device.name}</li>
+            ))}
+          </ul>
         )}
+        {/* Pagination */}
+        <button onClick={() => handlePageChangeDevices(currentPageDevices - 1)} disabled={currentPageDevices <= 0}>
+          Previous
+        </button>
+        <span>{currentPageDevices + 1} / {totalPagesDevices}</span>
+        <button onClick={() => handlePageChangeDevices(currentPageDevices + 1)} disabled={currentPageDevices >= totalPagesDevices - 1}>
+          Next
+        </button>
+      </div>
+
+      {/* Dashboards List */}
+      <div>
+        <h2>Dashboards</h2>
+        {loadingDashboards ? (
+          <p>Loading dashboards...</p>
+        ) : (
+          <ul>
+            {dashboards.map((dashboard) => (
+              <li key={dashboard.id}>{dashboard.title}</li>
+            ))}
+          </ul>
+        )}
+        {/* Pagination */}
+        <button onClick={() => handlePageChangeDashboards(currentPageDashboards - 1)} disabled={currentPageDashboards <= 0}>
+          Previous
+        </button>
+        <span>{currentPageDashboards + 1} / {totalPagesDashboards}</span>
+        <button onClick={() => handlePageChangeDashboards(currentPageDashboards + 1)} disabled={currentPageDashboards >= totalPagesDashboards - 1}>
+          Next
+        </button>
+      </div>
+
+      {/* Users List */}
+      <div>
+        <h2>Users</h2>
+        {loadingUsers ? (
+          <p>Loading users...</p>
+        ) : (
+          <ul>
+            {users.map((user) => (
+              <li key={user.id}>{user.username}</li>
+            ))}
+          </ul>
+        )}
+        {/* Pagination */}
+        <button onClick={() => handlePageChangeUsers(currentPageUsers - 1)} disabled={currentPageUsers <= 0}>
+          Previous
+        </button>
+        <span>{currentPageUsers + 1} / {totalPagesUsers}</span>
+        <button onClick={() => handlePageChangeUsers(currentPageUsers + 1)} disabled={currentPageUsers >= totalPagesUsers - 1}>
+          Next
+        </button>
       </div>
     </div>
   );
