@@ -1,95 +1,115 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../api/loginApi';
-import "./Login.css";
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
-
-const CustomTextField = styled(TextField)(({ }) => ({
-    width: '90%',
-    '& .MuiInputLabel-root': {
-        color: 'white',
-        fontSize: '14px',
-        '&.Mui-focused': {
-            color: 'rgba(255, 255, 255, 0.7)',
-        }
-    },
-    '& .MuiInputBase-root': {
-        color: 'white',
-    },
-    '& .MuiInputBase-input': {
-        color: 'white',
-    },
-    '& .MuiInputBase-input::placeholder': {
-        color: 'rgba(255, 255, 255, 0.5)',
-    },
-    '& .MuiInput-underline:before': {
-        borderBottom: '1px solid rgba(255, 255, 255, 0.3)', // Color of the underline before focus
-    },
-    '& .MuiInput-underline:after': {
-        borderBottom: '2px solid white', // Color of the underline after focus
-    },
-    '& .MuiInput-underline:hover:before': {
-        borderBottom: '1px solid rgba(255, 255, 255, 0.5)', // Color of the underline on hover
-    },
-}));
+import './Login.css'; // Ensure this CSS file contains the provided styles
+import waveImg from '../../assets/wave.png';
+import bgImg from '../../assets/bg.svg';
+import avatarImg from '../../assets/avatar.svg';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const navigate = useNavigate();
-    const usernameRef = useRef<HTMLInputElement | null>(null);
-
-    const handleLogin = async (event: React.FormEvent) => {
+    const usernameRef = useRef<HTMLInputElement>(null);
+    
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         try {
             await login(username, password);
-            alert('Login successful!');
-            navigate('/dashboard');
+            localStorage.setItem('username', username);
+            navigate('/dashboard', {state:username});
         } catch (error) {
-            alert('Login failed');
+            console.log("Login Failed");
         }
     };
 
     useEffect(() => {
         if (usernameRef.current) {
-            usernameRef.current.focus();
+            setTimeout(() => {
+                usernameRef.current?.focus();
+            }, 0);
         }
+    }, []);
+
+    useEffect(() => {
+        const inputs = document.querySelectorAll<HTMLInputElement>(".input");
+
+        const addcl = function (this: HTMLInputElement) {
+            const parent = this.parentNode?.parentNode as HTMLElement;
+            if (parent) {
+                parent.classList.add("focus");
+            }
+        };
+
+        const remcl = function (this: HTMLInputElement) {
+            const parent = this.parentNode?.parentNode as HTMLElement;
+            if (parent && this.value === "") {
+                parent.classList.remove("focus");
+            }
+        };
+
+        inputs.forEach((input) => {
+            input.addEventListener("focus", addcl);
+            input.addEventListener("blur", remcl);
+        });
+
+        return () => {
+            inputs.forEach((input) => {
+                input.removeEventListener("focus", addcl);
+                input.removeEventListener("blur", remcl);
+            });
+        };
     }, []);
 
     return (
         <div className="login-page">
-            <form onSubmit={handleLogin} className="form-login">
-                <h1>SIGN IN</h1>
-                <div className="login">
-                    <CustomTextField
-                        id="username"
-                        label="USERNAME"
-                        variant="standard"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className='input-field'
-                        inputRef={usernameRef}
-                        autoComplete="username"
-                    />
+            <img className="wave" src={waveImg} alt="wave" />
+            <div className="container">
+                <div className="img">
+                    <img src={bgImg} alt="background" />
                 </div>
-                <div className="login">
-                    <CustomTextField
-                        id="password"
-                        label="PASSWORD"
-                        type="password"
-                        variant="standard"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className='input-field'
-                        autoComplete="current-password"
-                    />
+                <div className="login-content">
+                    <form onSubmit={handleLogin} autoComplete="on">
+                        <img src={avatarImg} alt="avatar" />
+                        <h2 className="title">Welcome</h2>
+                        <div className="input-div one">
+                            <div className="i">
+                                <i className="fas fa-user"></i>
+                            </div>
+                            <div className="div">
+                                <h5>Username</h5>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    ref={usernameRef}
+                                    autoComplete="username"
+                                />
+                            </div>
+                        </div>
+                        <div className="input-div pass">
+                            <div className="i">
+                                <i className="fas fa-lock"></i>
+                            </div>
+                            <div className="div">
+                                <h5>Password</h5>
+                                <input
+                                    type="password"
+                                    className="input"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    autoComplete="current-password"
+                                />
+                            </div>
+                        </div>
+                        <a href="#">Forgot Password?</a>
+                        <button type="submit" className="btn">
+                            Login
+                        </button>
+                    </form>
                 </div>
-                <Button variant="contained" color="primary" type="submit" sx={{ marginTop: "60px" }}>
-                    Login
-                </Button>
-            </form>
+            </div>
         </div>
     );
 };
