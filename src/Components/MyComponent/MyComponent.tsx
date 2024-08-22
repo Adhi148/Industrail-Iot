@@ -3,10 +3,11 @@ import {
   Device,
   Dashboard,
   DeviceQueryParams,
+  PageData
 } from '../../types/thingsboardTypes';
 import { login, logout } from '../../api/loginApi';
 import { getTenantDevices, saveDevice } from '../../api/deviceApi';
-import { saveDashboard } from '../../api/dashboardApi'; // Ensure you have this API function
+import { saveDashboard } from '../../api/dashboardApi';
 
 const MyComponent: React.FC = () => {
   // State for login
@@ -35,8 +36,8 @@ const MyComponent: React.FC = () => {
       await login(username, password);
       alert('Login successful!');
       setLoginError(null);
-    } catch (error) {
-      setLoginError('Login failed');
+    } catch (error: any) {
+      setLoginError(error.message || 'Login failed');
     }
   };
 
@@ -57,9 +58,9 @@ const MyComponent: React.FC = () => {
       setDeviceName('');
       setDeviceType('');
       alert('Device created successfully!');
-      fetchDevices(); // Optionally refetch devices
-    } catch (error) {
-      setDeviceError('Failed to create device');
+      fetchDevices(1); // Optionally refetch devices
+    } catch (error: any) {
+      setDeviceError(error.message || 'Failed to create device');
     }
   };
 
@@ -72,9 +73,8 @@ const MyComponent: React.FC = () => {
       await saveDashboard(newDashboard);
       setDashboardTitle('');
       alert('Dashboard created successfully!');
-      // fetchDashboards(); // Optionally refetch dashboards
-    } catch (error) {
-      setDashboardError('Failed to create dashboard');
+    } catch (error: any) {
+      setDashboardError(error.message || 'Failed to create dashboard');
     }
   };
 
@@ -84,12 +84,12 @@ const MyComponent: React.FC = () => {
       setLoadingDevices(true);
 
       const params: DeviceQueryParams = {
-        pageSize: 10, // Adjust as needed
+        pageSize: 10,
         page: page,
-        type: 'default', // Adjust as needed or remove if not filtering by type
-        textSearch: '', // Adjust as needed or remove if not searching
-        sortProperty: 'name', // Adjust as needed or remove if not sorting
-        sortOrder: 'ASC', // Adjust as needed or remove if not sorting
+        type: 'default',
+        textSearch: '',
+        sortProperty: 'name',
+        sortOrder: 'ASC',
       };
 
       const data: PageData<Device> = await getTenantDevices(params);

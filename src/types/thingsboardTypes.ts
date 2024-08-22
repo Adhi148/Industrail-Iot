@@ -57,7 +57,7 @@ export interface DeviceQueryParams {
 }
 
 export interface PageData<T> {
-  data: T[];
+  data: T[]; // Assuming data is always present
   totalPages: number;
   totalElements: number;
   hasNext: boolean;

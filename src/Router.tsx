@@ -16,12 +16,11 @@ import Adduser from "./Components/Add-User/Adduser";
 import Addvehicle from "./Components/Add-Vehicle/Addvehicle";
 import MyComponent from "./Components/MyComponent/MyComponent";
 import Login from "./Components/Login/Login";
-import PrivateRoute from './Components/PrivateRoute';
 
 const Router = createBrowserRouter([
     {
         path: '/',
-        element: <PrivateRoute element={<App />} />,
+        element: <App />,
         children: [
             {
                 path: '/dashboard',
