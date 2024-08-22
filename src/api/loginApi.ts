@@ -12,7 +12,6 @@ export const login = async (
     );
     const token = response.data.token;
     localStorage.setItem('token', token);
-    console.log(response)
     return token;
   } catch (error) {
     console.error('Login failed', error);
