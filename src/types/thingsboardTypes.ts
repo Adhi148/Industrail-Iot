@@ -38,6 +38,15 @@ export interface DashboardInfo {
   updatedTime?: string;
 }
 
+export interface DashboardQueryParams {
+  pageSize: number;
+  page: number;
+  textSearch?: string;
+  sortProperty?: string;
+  sortOrder?: 'ASC' | 'DESC';
+}
+
+
 // Widget types
 export interface Widget {
   id?: string;
@@ -87,8 +96,37 @@ export interface UserSettings {
 }
 
 export interface MobileSessionData {
-  data: T[]; // Assuming data is always present
+  data: any[]; // Assuming data is always present
   totalPages: number;
   totalElements: number;
   hasNext: boolean;
+}
+
+
+// Interface for WidgetBundle
+export interface WidgetBundle {
+  id?: string;
+  name?: string;
+  alias?: string;
+  description?: string;
+  title?: string;
+  image?: string; // Assuming inline images are base64 encoded strings
+  widgets?: Widget[]; // Optional, can be an array of Widgets
+}
+
+// Interface for Widget
+export interface Widget {
+  id?: string;
+  name?: string;
+  type?: string;
+  bundleAlias?: string;
+  isSystemType?: boolean;
+}
+
+// Interface for WidgetTypeFQN (Fully Qualified Name)
+export interface WidgetTypeFQN {
+  alias?: string;
+  bundleAlias?: string;
+  name?: string;
+  type?: string;
 }
