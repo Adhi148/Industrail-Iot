@@ -49,16 +49,17 @@ export const getTenantAdmins = async (
 };
 
 // Save or Update User
-export const saveUser = async (user: User, sendActivationMail: boolean = true) => {
+export const saveUser = async (user: User, sendActivationMail: boolean = false): Promise<User> => {
   try {
-    const response = await thingsboardAPI.post(
-      `/user?sendActivationMail=${sendActivationMail}`
-    );
-    console.log(response)
-    return response.data;
+      const response = await thingsboardAPI.post<User>('/user', user, {
+          params: {
+              sendActivationMail
+          }
+      });
+      return response.data;
   } catch (error) {
-    console.error('Error saving or updating user:', error);
-    throw new Error('Unable to save or update user. Please try again later.');
+      console.error('Error creating or updating user:', error);
+      throw error;
   }
 };
 

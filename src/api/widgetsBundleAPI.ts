@@ -1,6 +1,8 @@
 import { WidgetBundle, Widget, PageData } from '../types/thingsboardTypes';
 import thingsboardAPI from './thingsboardAPI';
 
+const DEFAULT_PAGE_SIZE = 10
+
 // Create or Update Widget Bundle
 export const saveWidgetsBundle = async (bundle: WidgetBundle): Promise<WidgetBundle> => {
     try {
@@ -68,10 +70,10 @@ export const getAllWidgetsBundles = async (): Promise<WidgetBundle[]> => {
 
 // Get Widget Bundles (Paginated, Sorted, Searchable)
 export const getWidgetsBundles = async (
-    pageSize?: number,
-    page?: number,
+    pageSize: number,
+    page: number = 0,
     textSearch?: string,
-    sortProperty?: string,
+    sortProperty?: 'createdTime' |  'title' | 'tenantId',
     sortOrder?: 'ASC' | 'DESC',
     tenantOnly?: boolean,
     fullSearch?: boolean
