@@ -63,6 +63,7 @@ const Devices: React.FC = () => {
         reason?: SnackbarCloseReason,
     ) => {
         if (reason === 'clickaway') {
+            event
             return;
         }
 
