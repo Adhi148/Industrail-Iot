@@ -10,16 +10,27 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 
 const AddDevice = () => {
-
     const [loading, setLoading] = useState(false);
 
-    // Separate state variables for each select input
     const [deviceType, setDeviceType] = useState('');
     const [admin, setAdmin] = useState('');
     const [location, setLocation] = useState('');
     const [action, setAction] = useState('');
+    const [devicename, setDevicename] = useState('');
+    const [label, setLabel] = useState('');
 
-    // Handle change events for each select input
+    const device = {
+        "Devicename" : devicename,
+        "Label" : label,
+        "Devicetype": deviceType,
+        "Admin" : admin ,
+        "Action" : action ,
+        "Location" : location
+    };
+
+    console.log(device)
+
+
     const handleDeviceTypeChange = (event: SelectChangeEvent) => {
         setDeviceType(event.target.value);
     };
@@ -48,23 +59,25 @@ const AddDevice = () => {
     return (
         <div className="menu-data">
             <div className="add-device">
-                <form action="">
+                <form>
                     <label htmlFor="" className="label">Device Info</label>
-                    <Box sx={{ width: '300%', backgroundColor: "#ebebeb", marginBottom: '20px' }}>
+                    <Box className="text-field-box">
                         <TextField
                             fullWidth
                             label="Name"
+                            onChange={(e)=>setDevicename(e.target.value)}
                         />
                     </Box>
                     <label htmlFor="" className="label">Label</label>
-                    <Box sx={{ width: '300%', backgroundColor: "#ebebeb", marginBottom: '20px' }}>
+                    <Box className="text-field-box">
                         <TextField
                             fullWidth
                             label="Label"
+                            onChange={(e) => setLabel(e.target.value)}
                         />
                     </Box>
                     <label htmlFor="" className="label">Type</label>
-                    <FormControl sx={{ marginBottom: "20px", minWidth: 120, display: "block", width: "100%" }}>
+                    <FormControl className="form-control">
                         <InputLabel id="device-type-label">Select Type</InputLabel>
                         <Select
                             labelId="device-type-label"
@@ -72,18 +85,16 @@ const AddDevice = () => {
                             value={deviceType}
                             label="Select Type"
                             onChange={handleDeviceTypeChange}
-                            sx={{ width: "300%", backgroundColor: "#ebebeb" }}
+                            className="form-control-inner"
                         >
-                            <MenuItem value="">
-                                <em>None</em>
+                            <MenuItem value="Default">
+                                <em>Default</em>
                             </MenuItem>
-                            <MenuItem value={10}>1</MenuItem>
-                            <MenuItem value={20}>2</MenuItem>
-                            <MenuItem value={30}>3</MenuItem>
+                            <MenuItem value={"Teperatue"}>Teperatue</MenuItem>
                         </Select>
                     </FormControl>
                     <label htmlFor="" className="label">Admin</label>
-                    <FormControl sx={{ marginBottom: "20px", minWidth: 120, display: "block", width: "100%" }}>
+                    <FormControl className="form-control">
                         <InputLabel id="admin-label">Select User</InputLabel>
                         <Select
                             labelId="admin-label"
@@ -91,7 +102,7 @@ const AddDevice = () => {
                             value={admin}
                             label="Select User"
                             onChange={handleAdminChange}
-                            sx={{ width: "300%", backgroundColor: "#ebebeb" }}
+                            className="form-control-inner"
                         >
                             <MenuItem value="">
                                 <em>None</em>
@@ -102,7 +113,7 @@ const AddDevice = () => {
                         </Select>
                     </FormControl>
                     <label htmlFor="" className="label">Location</label>
-                    <FormControl sx={{ marginBottom: "20px", minWidth: 120, display: "block", width: "100%" }}>
+                    <FormControl className="form-control">
                         <InputLabel id="location-label">Select Location</InputLabel>
                         <Select
                             labelId="location-label"
@@ -110,7 +121,7 @@ const AddDevice = () => {
                             value={location}
                             label="Select Location"
                             onChange={handleLocationChange}
-                            sx={{ width: "300%", backgroundColor: "#ebebeb" }}
+                            className="form-control-inner"
                         >
                             <MenuItem value="">
                                 <em>None</em>
@@ -121,7 +132,7 @@ const AddDevice = () => {
                         </Select>
                     </FormControl>
                     <label htmlFor="" className="label">Action</label>
-                    <FormControl sx={{ marginBottom: "20px", minWidth: 120, display: "block", width: "100%" }}>
+                    <FormControl className="form-control">
                         <InputLabel id="action-label">Select Action</InputLabel>
                         <Select
                             labelId="action-label"
@@ -129,7 +140,7 @@ const AddDevice = () => {
                             value={action}
                             label="Select Action"
                             onChange={handleActionChange}
-                            sx={{ width: "300%", backgroundColor: "#ebebeb" }}
+                            className="form-control-inner"
                         >
                             <MenuItem value="">
                                 <em>None</em>
@@ -149,7 +160,7 @@ const AddDevice = () => {
                             startIcon={<SaveIcon />}
                             variant="contained"
                             disabled={loading}
-                            sx={{ width: '150px', height: '50px' }}
+                            className="btn-save"
                         >
                             <span>Save</span>
                         </LoadingButton>
@@ -157,7 +168,7 @@ const AddDevice = () => {
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
 export default AddDevice;

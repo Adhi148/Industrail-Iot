@@ -33,48 +33,47 @@ const Login: React.FC = () => {
         >;
     }>({
         open: false,
-        Transition: SlideTransition, // Use SlideTransition exclusively
+        Transition: SlideTransition,
     });
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
-        setLoading(true); // Start loading
+        setLoading(true);
 
         try {
             await login(username, password);
             localStorage.setItem('username', username);
-            setSnackbarMessage('Login successful!');
-            setSnackbarStyle({ backgroundColor: 'green' }); // Set success color
-            setState({
-                open: true,
-                Transition: SlideTransition,
-            });
-
-            // Delay navigation to ensure Snackbar message is visible
             setTimeout(() => {
-                navigate('/dashboard', { state: username });
-            }, 1500); // Delay navigation
+                setSnackbarMessage('Login successful!');
+                setSnackbarStyle({ backgroundColor: 'green' });
+                setState({
+                    open: true,
+                    Transition: SlideTransition,
+                });
+                setTimeout(() => {
+                    setLoading(false);
+                    navigate('/dashboard', { state: username });
+                }, 1500);
+            }, 1000);
         } catch (error) {
+            // Handle login error
             setSnackbarMessage('Invalid username or password');
-            setSnackbarStyle({ backgroundColor: 'red' }); // Set error color
+            setSnackbarStyle({ backgroundColor: 'red' });
             setState({
                 open: true,
                 Transition: SlideTransition,
             });
-
-            // Keep button loading for 1.5 seconds to match Snackbar display
             setTimeout(() => {
-                setLoading(false); // Stop loading
-            }, 1500); // Match Snackbar display duration
-        } finally {
-            // Ensure loading is stopped after 1.5 seconds even if error occurs
-            setTimeout(() => {
-                if (!state.open) {
-                    setLoading(false); // Ensure loading is stopped if Snackbar is not open
-                }
-            }, 1500); // Ensure loading state stops after Snackbar timeout
+                setLoading(false);
+            }, 1500);
+        } finally { setTimeout(() => {
+                setLoading(false);
+            }, 1500);
         }
     };
+
+
+
 
     useEffect(() => {
         if (usernameRef.current) {
