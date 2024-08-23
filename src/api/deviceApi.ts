@@ -1,6 +1,60 @@
 import thingsboardAPI from './thingsboardAPI';
 import { Device, DeviceQueryParams, PageData } from '../types/thingsboardTypes';
 
+// Get commands to publish device telemetry
+export const getDevicePublishTelemetryCommands = async (
+  deviceId: string
+): Promise<any> => {
+  try {
+    const response = await thingsboardAPI.get(
+      `/device-connectivity/${deviceId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get device publish telemetry commands', error);
+    throw error;
+  }
+};
+
+// Download server certificate
+export const downloadServerCertificate = async (
+  protocol: string
+): Promise<Blob> => {
+  try {
+    const response = await thingsboardAPI.get(
+      `/device-connectivity/${protocol}/certificate/download`,
+      {
+        responseType: 'blob', // Ensure the response is treated as a file
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Failed to download server certificate', error);
+    throw error;
+  }
+};
+
+// Download generated docker-compose.yml file for gateway
+export const downloadGatewayDockerCompose = async (
+  deviceId: string
+): Promise<Blob> => {
+  try {
+    const response = await thingsboardAPI.get(
+      `/device-connectivity/gateway-launch/${deviceId}/docker-compose/download`,
+      {
+        responseType: 'blob', // Ensure the response is treated as a file
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      'Failed to download docker-compose.yml file for gateway',
+      error
+    );
+    throw error;
+  }
+};
+
 // Assign device to customer
 export const assignDeviceToCustomer = async (
   customerId: string,
@@ -17,10 +71,21 @@ export const assignDeviceToCustomer = async (
 // Get Customer Device Infos
 export const getCustomerDeviceInfos = async (
   customerId: string,
-  params?: { pageSize?: number; page?: number; type?: string; active?: boolean; textSearch?: string; sortProperty?: string; sortOrder?: string }
+  params?: {
+    pageSize?: number;
+    page?: number;
+    type?: string;
+    active?: boolean;
+    textSearch?: string;
+    sortProperty?: string;
+    sortOrder?: string;
+  }
 ): Promise<any> => {
   try {
-    const response = await thingsboardAPI.get(`/customer/${customerId}/deviceInfos`, { params });
+    const response = await thingsboardAPI.get(
+      `/customer/${customerId}/deviceInfos`,
+      { params }
+    );
     return response.data;
   } catch (error) {
     console.error('Failed to get customer device infos', error);
@@ -31,10 +96,20 @@ export const getCustomerDeviceInfos = async (
 // Get Customer Devices
 export const getCustomerDevices = async (
   customerId: string,
-  params?: { pageSize?: number; page?: number; type?: string; textSearch?: string; sortProperty?: string; sortOrder?: string }
+  params?: {
+    pageSize?: number;
+    page?: number;
+    type?: string;
+    textSearch?: string;
+    sortProperty?: string;
+    sortOrder?: string;
+  }
 ): Promise<Device[]> => {
   try {
-    const response = await thingsboardAPI.get(`/customer/${customerId}/devices`, { params });
+    const response = await thingsboardAPI.get(
+      `/customer/${customerId}/devices`,
+      { params }
+    );
     return response.data;
   } catch (error) {
     console.error('Failed to get customer devices', error);
@@ -57,7 +132,9 @@ export const unassignDeviceFromCustomer = async (
 // Claim device
 export const claimDevice = async (deviceName: string): Promise<Device> => {
   try {
-    const response = await thingsboardAPI.post<Device>(`/customer/device/${deviceName}/claim`);
+    const response = await thingsboardAPI.post<Device>(
+      `/customer/device/${deviceName}/claim`
+    );
     return response.data;
   } catch (error) {
     console.error('Failed to claim device', error);
@@ -76,7 +153,9 @@ export const reClaimDevice = async (deviceName: string): Promise<void> => {
 };
 
 // Make device publicly available
-export const assignDeviceToPublicCustomer = async (deviceId: string): Promise<void> => {
+export const assignDeviceToPublicCustomer = async (
+  deviceId: string
+): Promise<void> => {
   try {
     await thingsboardAPI.post(`/customer/public/device/${deviceId}`);
   } catch (error) {
@@ -86,9 +165,14 @@ export const assignDeviceToPublicCustomer = async (deviceId: string): Promise<vo
 };
 
 // Create Device with Credentials
-export const saveDeviceWithCredentials = async (device: Device): Promise<Device> => {
+export const saveDeviceWithCredentials = async (
+  device: Device
+): Promise<Device> => {
   try {
-    const response = await thingsboardAPI.post<Device>('/device-with-credentials', device);
+    const response = await thingsboardAPI.post<Device>(
+      '/device-with-credentials',
+      device
+    );
     return response.data;
   } catch (error) {
     console.error('Failed to create device with credentials', error);
@@ -97,9 +181,14 @@ export const saveDeviceWithCredentials = async (device: Device): Promise<Device>
 };
 
 // Create or Update Device
-export const saveDevice = async (device: Device, accessToken?: string): Promise<Device> => {
+export const saveDevice = async (
+  device: Device,
+  accessToken?: string
+): Promise<Device> => {
   try {
-    const response = await thingsboardAPI.post<Device>('/device', device, { params: { accessToken } });
+    const response = await thingsboardAPI.post<Device>('/device', device, {
+      params: { accessToken },
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to create or update device', error);
@@ -129,9 +218,13 @@ export const deleteDevice = async (deviceId: string): Promise<void> => {
 };
 
 // Get Device Credentials by Device ID
-export const getDeviceCredentialsByDeviceId = async (deviceId: string): Promise<any> => {
+export const getDeviceCredentialsByDeviceId = async (
+  deviceId: string
+): Promise<any> => {
   try {
-    const response = await thingsboardAPI.get(`/device/${deviceId}/credentials`);
+    const response = await thingsboardAPI.get(
+      `/device/${deviceId}/credentials`
+    );
     return response.data;
   } catch (error) {
     console.error('Failed to get device credentials by ID', error);
@@ -140,7 +233,10 @@ export const getDeviceCredentialsByDeviceId = async (deviceId: string): Promise<
 };
 
 // Update Device Credentials
-export const updateDeviceCredentials = async (deviceId: string, credentials: any): Promise<void> => {
+export const updateDeviceCredentials = async (
+  deviceId: string,
+  credentials: any
+): Promise<void> => {
   try {
     await thingsboardAPI.post(`/device/${deviceId}/credentials`, credentials);
   } catch (error) {
@@ -150,7 +246,9 @@ export const updateDeviceCredentials = async (deviceId: string, credentials: any
 };
 
 // Import the bulk of devices
-export const processDevicesBulkImport = async (devices: any[]): Promise<void> => {
+export const processDevicesBulkImport = async (
+  devices: any[]
+): Promise<void> => {
   try {
     await thingsboardAPI.post('/device/bulk_import', devices);
   } catch (error) {
@@ -182,9 +280,13 @@ export const getAllDevices = async (query: any): Promise<any> => {
 };
 
 // Get Devices By Ids
-export const getDevicesByIds = async (deviceIds: string[]): Promise<Device[]> => {
+export const getDevicesByIds = async (
+  deviceIds: string[]
+): Promise<Device[]> => {
   try {
-    const response = await thingsboardAPI.get('/devices', { params: { deviceIds } });
+    const response = await thingsboardAPI.get('/devices', {
+      params: { deviceIds },
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to get devices by IDs', error);
@@ -193,9 +295,14 @@ export const getDevicesByIds = async (deviceIds: string[]): Promise<Device[]> =>
 };
 
 // Count devices by device profile
-export const countByDeviceProfileAndEmptyOtaPackage = async (otaPackageType: string, deviceProfileId: string): Promise<number> => {
+export const countByDeviceProfileAndEmptyOtaPackage = async (
+  otaPackageType: string,
+  deviceProfileId: string
+): Promise<number> => {
   try {
-    const response = await thingsboardAPI.get(`/devices/count/${otaPackageType}/${deviceProfileId}`);
+    const response = await thingsboardAPI.get(
+      `/devices/count/${otaPackageType}/${deviceProfileId}`
+    );
     return response.data;
   } catch (error) {
     console.error('Failed to count devices by device profile', error);
@@ -204,7 +311,10 @@ export const countByDeviceProfileAndEmptyOtaPackage = async (otaPackageType: str
 };
 
 // Assign device to edge
-export const assignDeviceToEdge = async (edgeId: string, deviceId: string): Promise<void> => {
+export const assignDeviceToEdge = async (
+  edgeId: string,
+  deviceId: string
+): Promise<void> => {
   try {
     await thingsboardAPI.post(`/edge/${edgeId}/device/${deviceId}`);
   } catch (error) {
@@ -214,7 +324,10 @@ export const assignDeviceToEdge = async (edgeId: string, deviceId: string): Prom
 };
 
 // Unassign device from edge
-export const unassignDeviceFromEdge = async (edgeId: string, deviceId: string): Promise<void> => {
+export const unassignDeviceFromEdge = async (
+  edgeId: string,
+  deviceId: string
+): Promise<void> => {
   try {
     await thingsboardAPI.delete(`/edge/${edgeId}/device/${deviceId}`);
   } catch (error) {
@@ -226,10 +339,22 @@ export const unassignDeviceFromEdge = async (edgeId: string, deviceId: string): 
 // Get devices assigned to edge
 export const getEdgeDevices = async (
   edgeId: string,
-  params?: { pageSize?: number; page?: number; type?: string; active?: boolean; textSearch?: string; sortProperty?: string; sortOrder?: string; startTime?: number; endTime?: number }
+  params?: {
+    pageSize?: number;
+    page?: number;
+    type?: string;
+    active?: boolean;
+    textSearch?: string;
+    sortProperty?: string;
+    sortOrder?: string;
+    startTime?: number;
+    endTime?: number;
+  }
 ): Promise<any> => {
   try {
-    const response = await thingsboardAPI.get(`/edge/${edgeId}/devices`, { params });
+    const response = await thingsboardAPI.get(`/edge/${edgeId}/devices`, {
+      params,
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to get devices assigned to edge', error);
@@ -238,7 +363,10 @@ export const getEdgeDevices = async (
 };
 
 // Assign device to tenant
-export const assignDeviceToTenant = async (tenantId: string, deviceId: string): Promise<void> => {
+export const assignDeviceToTenant = async (
+  tenantId: string,
+  deviceId: string
+): Promise<void> => {
   try {
     await thingsboardAPI.post(`/tenant/${tenantId}/device/${deviceId}`);
   } catch (error) {
@@ -248,11 +376,19 @@ export const assignDeviceToTenant = async (tenantId: string, deviceId: string): 
 };
 
 // Get Tenant Device Infos
-export const getTenantDeviceInfos = async (
-  params?: { pageSize?: number; page?: number; type?: string; active?: boolean; textSearch?: string; sortProperty?: string; sortOrder?: string }
-): Promise<any> => {
+export const getTenantDeviceInfos = async (params?: {
+  pageSize?: number;
+  page?: number;
+  type?: string;
+  active?: boolean;
+  textSearch?: string;
+  sortProperty?: string;
+  sortOrder?: string;
+}): Promise<any> => {
   try {
-    const response = await thingsboardAPI.get(`/tenant/deviceInfos`, { params });
+    const response = await thingsboardAPI.get(`/tenant/deviceInfos`, {
+      params,
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to get tenant device infos', error);
@@ -263,7 +399,9 @@ export const getTenantDeviceInfos = async (
 // Get Tenant Device
 export const getTenantDevice = async (deviceName: string): Promise<Device> => {
   try {
-    const response = await thingsboardAPI.get<Device>(`/tenant/devices`, { params: { deviceName } });
+    const response = await thingsboardAPI.get<Device>(`/tenant/devices`, {
+      params: { deviceName },
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to get tenant device', error);

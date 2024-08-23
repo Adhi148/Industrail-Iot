@@ -1,23 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import {
   Device,
-  Dashboard,
+  DashboardType,
   User,
   DeviceQueryParams,
   PageData,
   DashboardQueryParams,
 } from '../../types/thingsboardTypes';
 import { login, logout } from '../../api/loginApi';
-import { getTenantDevices, saveDevice } from '../../api/deviceApi';
+import {
+  deleteDevice,
+  getDeviceInfoById,
+  getDevicePublishTelemetryCommands,
+  getTenantDevices,
+  saveDevice,
+} from '../../api/deviceApi';
 import { getTenantDashboards, saveDashboard } from '../../api/dashboardApi';
 import { getUsers, saveUser } from '../../api/userApi';
 import {
   getAllWidgetsBundles,
   getWidgetsBundles,
 } from '../../api/widgetsBundleAPI';
-import { resolvePath } from 'react-router-dom';
+import { getDeviceProfileNames } from '../../api/deviceProfileAPIs';
+// import { generateUUIDv1 } from '../../Utility/utility_functions';
 
 const MyComponent: React.FC = () => {
+  // const uuid = generateUUIDv1()
+  // console.log(uuid)
+
   // State for login
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -42,7 +52,7 @@ const MyComponent: React.FC = () => {
   const [loadingDevices, setLoadingDevices] = useState<boolean>(false);
 
   // State for dashboards
-  const [dashboards, setDashboards] = useState<Dashboard[]>([]);
+  const [dashboards, setDashboards] = useState<DashboardType[]>([]);
   const [loadingDashboards, setLoadingDashboards] = useState<boolean>(false);
 
   // State for users
@@ -56,9 +66,12 @@ const MyComponent: React.FC = () => {
   const [currentWidgetPage, setCurrentWidgetPage] = useState<number>(0);
   const [totalWidgetPages, setTotalWidgetPages] = useState<number>(0);
 
+  const [deviceProfileNames, setDeviceProfileNames] = useState<any[]>([]);
+
   // Fetch widget bundles with parameters
   const fetchAllWidgetBundles = async () => {
     try {
+      const response = await getAllWidgetsBundles();
       setLoadingWidgetBundles(true);
       setWidgetBundles(response || []);
     } catch (error) {
@@ -74,7 +87,7 @@ const MyComponent: React.FC = () => {
       setLoadingWidgetBundles(true);
       const response = await getWidgetsBundles(10, page);
       setWidgetBundles(response.data || []);
-      setTotalWidgetPages(response.totalPages | 0);
+      setTotalWidgetPages(response.totalPages ?? 0);
     } catch (error) {
       console.error('Failed to fetch widget bundles', error);
     } finally {
@@ -108,8 +121,8 @@ const MyComponent: React.FC = () => {
       };
       await saveDevice(newDevice);
       setDeviceName('');
-      setDeviceType('');
-      alert('Device created successfully!');
+      // setDeviceType('');
+      // alert('Device created successfully!');
       fetchDevices(0); // Optionally refetch devices
     } catch (error) {
       setDeviceError('Failed to create device');
@@ -119,7 +132,7 @@ const MyComponent: React.FC = () => {
   // Handle dashboard creation
   const handleCreateDashboard = async () => {
     try {
-      const newDashboard: Dashboard = {
+      const newDashboard: DashboardType = {
         title: dashboardTitle,
       };
       await saveDashboard(newDashboard);
@@ -135,15 +148,22 @@ const MyComponent: React.FC = () => {
   const handleCreateUser = async () => {
     try {
       const newUser: User = {
-        "email": "user@example.com",
-        "authority": "SYS_ADMIN, TENANT_ADMIN or CUSTOMER_USER",
-      }
-      await saveUser(newUser, sendActivationMail);
+        // id: {
+        //   entityType: "USER"
+        // },
+        email: 'iamniyazahmad777@gmail.com',
+        authority: 'TENANT_ADMIN', // Use one of the accepted authority values
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: '38012345123', // Change to string
+        additionalInfo: {},
+      };
+      await saveUser(newUser, sendActivationMail); // Assuming `sendActivationMail` is true
       setNewUsername('');
       alert('User created successfully!');
       fetchUsers(0); // Optionally refetch users
-    } catch (error) {
-      setUserError('Failed to create user');
+    } catch (error: any) {
+      setUserError('Failed to create user: ' + error.message); // Display error message
     }
   };
 
@@ -162,11 +182,21 @@ const MyComponent: React.FC = () => {
       };
 
       const response: PageData<Device> = await getTenantDevices(params);
-      setDevices(response.data);
+      setDevices(response.data ?? []);
     } catch (error) {
       console.error('Failed to fetch devices', error);
     } finally {
       setLoadingDevices(false);
+    }
+  };
+
+  // Fetch devices
+  const fetchDeviceProfileNames = async (activeOnly) => {
+    try {
+      const names = await getDeviceProfileNames(activeOnly);
+      setDeviceProfileNames(names);
+    } catch (error) {
+      console.error('Failed to load device profile names');
     }
   };
 
@@ -183,9 +213,11 @@ const MyComponent: React.FC = () => {
         sortOrder: 'ASC', // Adjust as needed or remove if not sorting
       };
 
-      const response: PageData<Dashboard> = await getTenantDashboards(params);
+      const response: PageData<DashboardType> = await getTenantDashboards(
+        params
+      );
 
-      setDashboards(response.data);
+      setDashboards(response.data ?? []);
     } catch (error) {
       console.error('Failed to fetch dashboards', error);
     } finally {
@@ -207,11 +239,13 @@ const MyComponent: React.FC = () => {
     }
   };
 
-  const handleGetAll = () => {
+  const handleGetAll = async () => {
     fetchDevices(0);
     fetchDashboards(0);
     fetchUsers(0);
-    fetchAllWidgetBundles(0);
+    fetchAllWidgetBundles();
+    fetchWidgetBundles(currentWidgetPage);
+    fetchDeviceProfileNames(false);
   };
 
   const handlePageChangeWidgets = (page: number) => {
@@ -224,6 +258,7 @@ const MyComponent: React.FC = () => {
     fetchUsers(0);
     fetchAllWidgetBundles(); // Fetch widget bundles on component mount
     fetchWidgetBundles(currentWidgetPage);
+    fetchDeviceProfileNames(false);
   }, []);
 
   useEffect(() => {
@@ -322,6 +357,17 @@ const MyComponent: React.FC = () => {
         )}
       </div>
 
+      {/* Device Profiles List */}
+      <div>
+        <h2>Device Profiles</h2>
+        <ul>
+            {deviceProfileNames.map((deviceProfile) => (
+              <li key={deviceProfile.id.id}>{deviceProfile.name}</li>
+            ))}
+          </ul>
+        )
+      </div>
+
       {/* Dashboards List */}
       <div>
         <h2>Dashboards</h2>
@@ -329,8 +375,8 @@ const MyComponent: React.FC = () => {
           <p>Loading dashboards...</p>
         ) : (
           <ul>
-            {dashboards.map((dashboard, index) => (
-              <li key={index}>{dashboard.title}</li>
+            {dashboards.map((dashboard) => (
+              <li key={dashboard.id.id}>{dashboard.title}</li>
             ))}
           </ul>
         )}
@@ -343,9 +389,9 @@ const MyComponent: React.FC = () => {
           <p>Loading users...</p>
         ) : (
           <ul>
-            {users.map((user, index) => (
-              <li key={index}>
-                {user.name}({user.authority})
+            {users.map((user) => (
+              <li key={user.id.id}>
+                {user.email}({user.authority})
               </li>
             ))}
           </ul>
