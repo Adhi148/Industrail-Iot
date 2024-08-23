@@ -51,9 +51,10 @@ export const getTenantAdmins = async (
 // Save or Update User
 export const saveUser = async (user: User, sendActivationMail: boolean = false): Promise<User> => {
   try {
+    console.log(sendActivationMail)
       const response = await thingsboardAPI.post<User>('/user', user, {
           params: {
-              sendActivationMail
+              sendActivationMail: sendActivationMail
           }
       });
       return response.data;

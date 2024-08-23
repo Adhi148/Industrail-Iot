@@ -19,8 +19,8 @@ export interface DeviceProfile {
 }
 
 // Dashboard types
-export interface Dashboardtype {
-  id?: string;
+export interface DashboardType {
+  id?: any;
   title?: string;
   description?: string; // Optional: Description of the dashboard
   createdTime?: string; // Optional: ISO 8601 format
@@ -82,11 +82,14 @@ export interface PageData<T> {
 
 // User types
 export interface User {
-  id?: string;
-  name?: string;
+  id?: any;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   authority?: string;
   additionalInfo?: any;
+  phone?: string,
+
 }
 
 export interface UserSettings {
