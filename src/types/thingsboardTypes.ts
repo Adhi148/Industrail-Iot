@@ -19,7 +19,7 @@ export interface DeviceProfile {
 }
 
 // Dashboard types
-export interface Dashboard {
+export interface Dashboardtype {
   id?: string;
   title?: string;
   description?: string; // Optional: Description of the dashboard

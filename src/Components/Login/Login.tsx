@@ -5,21 +5,74 @@ import './Login.css'; // Ensure this CSS file contains the provided styles
 import waveImg from '../../assets/wave.png';
 import bgImg from '../../assets/bg.svg';
 import avatarImg from '../../assets/avatar.svg';
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
+import Snackbar from '@mui/material/Snackbar';
+import Slide, { SlideProps } from '@mui/material/Slide';
+import { TransitionProps } from '@mui/material/transitions';
+
+function SlideTransition(props: SlideProps) {
+    return <Slide {...props} direction="down" />;
+}
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false); // State for loading
+    const [snackbarMessage, setSnackbarMessage] = useState<string>(''); // State for Snackbar message
+    const [snackbarStyle, setSnackbarStyle] = useState<React.CSSProperties>({}); // State for Snackbar style
     const navigate = useNavigate();
     const usernameRef = useRef<HTMLInputElement>(null);
-    
+
+    const [state, setState] = React.useState<{
+        open: boolean;
+        Transition: React.ComponentType<
+            TransitionProps & {
+                children: React.ReactElement<any, any>;
+            }
+        >;
+    }>({
+        open: false,
+        Transition: SlideTransition, // Use SlideTransition exclusively
+    });
+
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
+        setLoading(true); // Start loading
+
         try {
             await login(username, password);
             localStorage.setItem('username', username);
-            navigate('/dashboard', {state:username});
+            setSnackbarMessage('Login successful!');
+            setSnackbarStyle({ backgroundColor: 'green' }); // Set success color
+            setState({
+                open: true,
+                Transition: SlideTransition,
+            });
+
+            // Delay navigation to ensure Snackbar message is visible
+            setTimeout(() => {
+                navigate('/dashboard', { state: username });
+            }, 1500); // Delay navigation
         } catch (error) {
-            console.log("Login Failed");
+            setSnackbarMessage('Invalid username or password');
+            setSnackbarStyle({ backgroundColor: 'red' }); // Set error color
+            setState({
+                open: true,
+                Transition: SlideTransition,
+            });
+
+            // Keep button loading for 1.5 seconds to match Snackbar display
+            setTimeout(() => {
+                setLoading(false); // Stop loading
+            }, 1500); // Match Snackbar display duration
+        } finally {
+            // Ensure loading is stopped after 1.5 seconds even if error occurs
+            setTimeout(() => {
+                if (!state.open) {
+                    setLoading(false); // Ensure loading is stopped if Snackbar is not open
+                }
+            }, 1500); // Ensure loading state stops after Snackbar timeout
         }
     };
 
@@ -60,6 +113,10 @@ const Login: React.FC = () => {
             });
         };
     }, []);
+
+    const handleClose = () => {
+        setState(prevState => ({ ...prevState, open: false }));
+    };
 
     return (
         <div className="login-page">
@@ -104,9 +161,33 @@ const Login: React.FC = () => {
                             </div>
                         </div>
                         <a href="#">Forgot Password?</a>
-                        <button type="submit" className="btn">
-                            Login
-                        </button>
+                        <LoadingButton
+                            type="submit"
+                            size="small"
+                            loading={loading}
+                            loadingPosition="start"
+                            startIcon={<SaveIcon />}
+                            variant="contained"
+                            sx={{ width: '150px', height: '50px', marginTop: "40px" }}
+                            className='btn'
+                        >
+                            <span>Login</span>
+                        </LoadingButton>
+                        <Snackbar
+                            open={state.open}
+                            onClose={handleClose}
+                            TransitionComponent={state.Transition}
+                            message={snackbarMessage}
+                            key={state.Transition.name}
+                            autoHideDuration={1500} // Snackbar duration
+                            ContentProps={{
+                                style: { ...snackbarStyle, textAlign: 'center' }, // Apply dynamic styles
+                            }}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'center',
+                            }}
+                        />
                     </form>
                 </div>
             </div>

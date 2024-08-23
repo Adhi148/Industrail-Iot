@@ -16,6 +16,7 @@ import Adduser from "./Components/Add-User/Adduser";
 import Addvehicle from "./Components/Add-Vehicle/Addvehicle";
 import MyComponent from "./Components/MyComponent/MyComponent";
 import Login from "./Components/Login/Login";
+import Accountinfo from "./Components/AccountInfo/Accountinfo";
 
 const Router = createBrowserRouter([
     {
@@ -81,6 +82,10 @@ const Router = createBrowserRouter([
             {
                 path: '/testComponent',
                 element: <MyComponent />,
+            },
+            {
+                path: '/accountinfo',
+                element:<Accountinfo/>
             }
         ]
     },

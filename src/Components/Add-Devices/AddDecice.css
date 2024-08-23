@@ -1,0 +1,15 @@
+.add-device{
+    width: 70%;
+    margin: 20px;
+    padding: 20px;
+    background-color: white;
+}
+.add-device .label {
+    font-size: 20px !important;
+    margin-bottom: 10px !important;
+    display: inline-block;
+}
+.add-device .accountinfo-savebtn {
+    text-align:start !important;
+    margin-top: 50px !important;
+}

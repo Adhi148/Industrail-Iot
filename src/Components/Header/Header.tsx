@@ -12,6 +12,7 @@ const Header: React.FC = () => {
     const [toggle, setToggle] = useState<string>("hidden");
     const navigate = useNavigate();
     const menuRef = useRef<HTMLDivElement>(null);
+    
 
     useEffect(() => {
         const stateUsername = location.state?.state || null;
@@ -42,29 +43,33 @@ const Header: React.FC = () => {
         navigate("/login");
     };
 
+
+
     return (
-        <div className="header">
-            <div className="logo">Myoorja</div>
-            <Link to="/dashboard" className="link link2">
-                <li>Home</li>
-            </Link>
-            <div className="account">
-                <li>
-                    <AccountCircleIcon className="accounticon" /> <span>{username}</span>
-                </li>
-                <li className="menuu" onClick={handleVisible}>
-                    <MoreVertIcon />
-                    <div className={`menu ${toggle}`} ref={menuRef}>
-                        <Link className="link2" to="">
-                            <AccountCircleIcon /><span>Account</span>
-                        </Link>
-                        <Link className="link2" to="" onClick={handleLogout}>
-                            <LogoutIcon /> <span>Logout</span>
-                        </Link>
-                    </div>
-                </li>
+        <>
+            <div className="header">
+                <div className="logo">Myoorja</div>
+                <Link to="/dashboard" className="link link2">
+                    <li>Home</li>
+                </Link>
+                <div className="account">
+                    <li>
+                        <AccountCircleIcon className="accounticon" /> <span>{username}</span>
+                    </li>
+                    <li className="menuu" onClick={handleVisible}>
+                        <MoreVertIcon />
+                        <div className={`menu ${toggle}`} ref={menuRef}>
+                            <Link className="link2" to="/accountinfo">
+                                <AccountCircleIcon /><span>Account</span>
+                            </Link>
+                            <Link className="link2" to="" onClick={handleLogout}>
+                                <LogoutIcon /> <span>Logout</span>
+                            </Link>
+                        </div>
+                    </li>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
