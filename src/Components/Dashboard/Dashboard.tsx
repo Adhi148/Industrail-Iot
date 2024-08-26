@@ -49,6 +49,7 @@ const Dashboard = () => {
     event: React.SyntheticEvent | Event,
     reason?: SnackbarCloseReason
   ) => {
+    event
     if (reason === 'clickaway') {
       return;
     }

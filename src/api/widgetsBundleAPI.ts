@@ -1,7 +1,6 @@
 import { WidgetBundle, Widget, PageData } from '../types/thingsboardTypes';
 import thingsboardAPI from './thingsboardAPI';
 
-const DEFAULT_PAGE_SIZE = 10
 
 // Create or Update Widget Bundle
 export const saveWidgetsBundle = async (bundle: WidgetBundle): Promise<WidgetBundle> => {

@@ -1,9 +1,9 @@
-import { Dashboard, PageData } from '../types/thingsboardTypes';
+import { Dashboard, DashboardType, PageData } from '../types/thingsboardTypes';
 import thingsboardAPI from './thingsboardAPI';
 
 
 // Create or Update Dashboard
-export const saveDashboard = async (dashboard: Dashboard): Promise<Dashboard> => {
+export const saveDashboard = async (dashboard: Dashboard): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.post('/dashboard', dashboard);
     return response.data;
@@ -14,7 +14,7 @@ export const saveDashboard = async (dashboard: Dashboard): Promise<Dashboard> =>
 };
 
 // Get Dashboard by ID
-export const getDashboardById = async (dashboardId: string, inlineImages = false): Promise<Dashboard> => {
+export const getDashboardById = async (dashboardId: string, inlineImages = false): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.get(`/dashboard/${dashboardId}`, { params: { inlineImages } });
     return response.data;
@@ -35,7 +35,7 @@ export const deleteDashboard = async (dashboardId: string): Promise<void> => {
 };
 
 // Assign Dashboard to Customer
-export const assignDashboardToCustomer = async (customerId: string, dashboardId: string): Promise<Dashboard> => {
+export const assignDashboardToCustomer = async (customerId: string, dashboardId: string): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.post(`/customer/${customerId}/dashboard/${dashboardId}`);
     return response.data;
@@ -56,7 +56,7 @@ export const unassignDashboardFromCustomer = async (customerId: string, dashboar
 };
 
 // Assign Dashboard to Public Customer
-export const assignDashboardToPublicCustomer = async (dashboardId: string): Promise<Dashboard> => {
+export const assignDashboardToPublicCustomer = async (dashboardId: string): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.post(`/customer/public/dashboard/${dashboardId}`);
     return response.data;
@@ -77,7 +77,7 @@ export const unassignDashboardFromPublicCustomer = async (dashboardId: string): 
 };
 
 // Get Customer Dashboards with Pagination
-export const getCustomerDashboards = async (customerId: string, params: { pageSize: number; page: number; mobile?: boolean; textSearch?: string; sortProperty?: string; sortOrder?: string }): Promise<PageData<Dashboard>> => {
+export const getCustomerDashboards = async (customerId: string, params: { pageSize: number; page: number; mobile?: boolean; textSearch?: string; sortProperty?: string; sortOrder?: string }): Promise<PageData<DashboardType>> => {
   try {
     const response = await thingsboardAPI.get(`/customer/${customerId}/dashboards`, { params });
     return response.data;
@@ -118,7 +118,7 @@ export const removeDashboardCustomers = async (dashboardId: string, customerIds:
 };
 
 // Get Home Dashboard
-export const getHomeDashboard = async (): Promise<Dashboard> => {
+export const getHomeDashboard = async (): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.get('/dashboard/home');
     return response.data;
@@ -129,7 +129,7 @@ export const getHomeDashboard = async (): Promise<Dashboard> => {
 };
 
 // Get Home Dashboard Info
-export const getHomeDashboardInfo = async (): Promise<Dashboard> => {
+export const getHomeDashboardInfo = async (): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.get('/dashboard/home/info');
     return response.data;
@@ -140,7 +140,7 @@ export const getHomeDashboardInfo = async (): Promise<Dashboard> => {
 };
 
 // Get Dashboard Info by ID
-export const getDashboardInfoById = async (dashboardId: string): Promise<Dashboard> => {
+export const getDashboardInfoById = async (dashboardId: string): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.get(`/dashboard/info/${dashboardId}`);
     return response.data;
@@ -173,7 +173,7 @@ export const getServerTime = async (): Promise<number> => {
 };
 
 // Assign Dashboard to Edge
-export const assignDashboardToEdge = async (edgeId: string, dashboardId: string): Promise<Dashboard> => {
+export const assignDashboardToEdge = async (edgeId: string, dashboardId: string): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.post(`/edge/${edgeId}/dashboard/${dashboardId}`);
     return response.data;
@@ -194,7 +194,7 @@ export const unassignDashboardFromEdge = async (edgeId: string, dashboardId: str
 };
 
 // Get Edge Dashboards with Pagination
-export const getEdgeDashboards = async (edgeId: string, params: { pageSize: number; page: number; textSearch?: string; sortProperty?: string; sortOrder?: string }): Promise<PageData<Dashboard>> => {
+export const getEdgeDashboards = async (edgeId: string, params: { pageSize: number; page: number; textSearch?: string; sortProperty?: string; sortOrder?: string }): Promise<PageData<DashboardType>> => {
   try {
     const response = await thingsboardAPI.get(`/edge/${edgeId}/dashboards`, { params });
     return response.data;
@@ -205,7 +205,7 @@ export const getEdgeDashboards = async (edgeId: string, params: { pageSize: numb
 };
 
 // Get Tenant Dashboards with Pagination
-export const getTenantDashboards = async (params: { pageSize: number; page: number; mobile?: boolean; textSearch?: string; sortProperty?: string; sortOrder?: string }): Promise<PageData<Dashboard>> => {
+export const getTenantDashboards = async (params: { pageSize: number; page: number; mobile?: boolean; textSearch?: string; sortProperty?: string; sortOrder?: string }): Promise<PageData<DashboardType>> => {
   try {
     const response = await thingsboardAPI.get('/tenant/dashboards', { params });
     return response.data;
@@ -216,7 +216,7 @@ export const getTenantDashboards = async (params: { pageSize: number; page: numb
 };
 
 // Get Tenant Home Dashboard Info
-export const getTenantHomeDashboardInfo = async (): Promise<Dashboard> => {
+export const getTenantHomeDashboardInfo = async (): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.get('/tenant/dashboard/home/info');
     return response.data;
@@ -227,7 +227,7 @@ export const getTenantHomeDashboardInfo = async (): Promise<Dashboard> => {
 };
 
 // Update Tenant Home Dashboard Info
-export const updateTenantHomeDashboardInfo = async (dashboard: Dashboard): Promise<Dashboard> => {
+export const updateTenantHomeDashboardInfo = async (dashboard: Dashboard): Promise<DashboardType> => {
   try {
     const response = await thingsboardAPI.post('/tenant/dashboard/home/info', dashboard);
     return response.data;
