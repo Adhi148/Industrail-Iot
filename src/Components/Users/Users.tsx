@@ -20,9 +20,7 @@ const Users = () => {
 
     return (
         <div className="menu-data">
-            <div className="users">
-                
-            </div>
+            user
         </div>
     )
 }

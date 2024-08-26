@@ -86,9 +86,7 @@ const App = () => {
                     timeout={500}
                     nodeRef={nodeRef}
                 >
-                    <div ref={nodeRef}>
-                        <Outlet />
-                    </div>
+                    <Outlet />
                 </CSSTransition>
             </TransitionGroup>
         </>
