@@ -1,4 +1,8 @@
-import { User, MobileSessionData, UserSettings } from '../types/thingsboardTypes';
+import {
+  User,
+  MobileSessionData,
+  UserSettings,
+} from '../types/thingsboardTypes';
 import thingsboardAPI from './thingsboardAPI';
 
 // Define default page size
@@ -13,12 +17,15 @@ export const getCustomerUsers = async (
   sortOrder: string = 'ASC'
 ) => {
   try {
-    const response = await thingsboardAPI.get(
-      `/customer/${customerId}/users`, 
-      {
-        params: { pageSize: DEFAULT_PAGE_SIZE, page, textSearch, sortProperty, sortOrder }
-      }
-    );
+    const response = await thingsboardAPI.get(`/customer/${customerId}/users`, {
+      params: {
+        pageSize: DEFAULT_PAGE_SIZE,
+        page,
+        textSearch,
+        sortProperty,
+        sortOrder,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching customer users:', error);
@@ -35,12 +42,15 @@ export const getTenantAdmins = async (
   sortOrder: string = 'ASC'
 ) => {
   try {
-    const response = await thingsboardAPI.get(
-      `/tenant/${tenantId}/users`, 
-      {
-        params: { pageSize: DEFAULT_PAGE_SIZE, page, textSearch, sortProperty, sortOrder }
-      }
-    );
+    const response = await thingsboardAPI.get(`/tenant/${tenantId}/users`, {
+      params: {
+        pageSize: DEFAULT_PAGE_SIZE,
+        page,
+        textSearch,
+        sortProperty,
+        sortOrder,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching tenant users:', error);
@@ -48,19 +58,24 @@ export const getTenantAdmins = async (
   }
 };
 
+
 // Save or Update User
-export const saveUser = async (user: User, sendActivationMail: boolean = false): Promise<User> => {
+export const saveUser = async (
+  user: User,
+  sendActivationMail: boolean = false
+): Promise<User> => {
   try {
-    console.log(sendActivationMail)
-      const response = await thingsboardAPI.post<User>('/user', user, {
-          params: {
-              sendActivationMail: sendActivationMail
-          }
-      });
-      return response.data;
-  } catch (error) {
-      console.error('Error creating or updating user:', error);
-      throw error;
+    const response = await thingsboardAPI.post<User>('/user', user, {
+      params: { sendActivationMail: sendActivationMail },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Server responded with error:', error.response.data); // More specific server error details
+    } else {
+      console.error('Error creating or updating user:', error.message); // General error message
+    }
+    throw error;
   }
 };
 
@@ -109,7 +124,10 @@ export const getUserToken = async (userId: string) => {
 };
 
 // Enable/Disable User Credentials
-export const setUserCredentialsEnabled = async (userId: string, userCredentialsEnabled: boolean) => {
+export const setUserCredentialsEnabled = async (
+  userId: string,
+  userCredentialsEnabled: boolean
+) => {
   try {
     const response = await thingsboardAPI.post(
       `/user/${userId}/userCredentialsEnabled?userCredentialsEnabled=${userCredentialsEnabled}`
@@ -128,18 +146,27 @@ export const getLastVisitedDashboards = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching last visited dashboards:', error);
-    throw new Error('Unable to fetch last visited dashboards. Please try again later.');
+    throw new Error(
+      'Unable to fetch last visited dashboards. Please try again later.'
+    );
   }
 };
 
 // Report User Dashboard Action
-export const reportUserDashboardAction = async (dashboardId: string, action: string) => {
+export const reportUserDashboardAction = async (
+  dashboardId: string,
+  action: string
+) => {
   try {
-    const response = await thingsboardAPI.get(`/user/dashboards/${dashboardId}/${action}`);
+    const response = await thingsboardAPI.get(
+      `/user/dashboards/${dashboardId}/${action}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error reporting user dashboard action:', error);
-    throw new Error('Unable to report user dashboard action. Please try again later.');
+    throw new Error(
+      'Unable to report user dashboard action. Please try again later.'
+    );
   }
 };
 
@@ -157,7 +184,10 @@ export const getMobileSession = async () => {
 // Save Mobile Session
 export const saveMobileSession = async (sessionData: MobileSessionData) => {
   try {
-    const response = await thingsboardAPI.post(`/user/mobile/session`, sessionData);
+    const response = await thingsboardAPI.post(
+      `/user/mobile/session`,
+      sessionData
+    );
     return response.data;
   } catch (error) {
     console.error('Error saving mobile session:', error);
@@ -179,7 +209,9 @@ export const removeMobileSession = async () => {
 // Send Activation Email
 export const sendActivationMail = async (email: string) => {
   try {
-    const response = await thingsboardAPI.post(`/user/sendActivationMail?email=${email}`);
+    const response = await thingsboardAPI.post(
+      `/user/sendActivationMail?email=${email}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error sending activation email:', error);
@@ -240,7 +272,13 @@ export const getUsers = async (
 ) => {
   try {
     const response = await thingsboardAPI.get(`/users`, {
-      params: { pageSize: DEFAULT_PAGE_SIZE, page, textSearch, sortProperty, sortOrder }
+      params: {
+        pageSize: DEFAULT_PAGE_SIZE,
+        page,
+        textSearch,
+        sortProperty,
+        sortOrder,
+      },
     });
     return response.data;
   } catch (error) {
@@ -258,16 +296,21 @@ export const getUsersForAssign = async (
   sortOrder: string = 'ASC'
 ) => {
   try {
-    const response = await thingsboardAPI.get(
-      `/users/assign/${alarmId}`, 
-      {
-        params: { pageSize: DEFAULT_PAGE_SIZE, page, textSearch, sortProperty, sortOrder }
-      }
-    );
+    const response = await thingsboardAPI.get(`/users/assign/${alarmId}`, {
+      params: {
+        pageSize: DEFAULT_PAGE_SIZE,
+        page,
+        textSearch,
+        sortProperty,
+        sortOrder,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching users for assign:', error);
-    throw new Error('Unable to fetch users for assign. Please try again later.');
+    throw new Error(
+      'Unable to fetch users for assign. Please try again later.'
+    );
   }
 };
 
@@ -280,7 +323,13 @@ export const findUsersByQuery = async (
 ) => {
   try {
     const response = await thingsboardAPI.get(`/users/query`, {
-      params: { pageSize: DEFAULT_PAGE_SIZE, page, textSearch, sortProperty, sortOrder }
+      params: {
+        pageSize: DEFAULT_PAGE_SIZE,
+        page,
+        textSearch,
+        sortProperty,
+        sortOrder,
+      },
     });
     return response.data;
   } catch (error) {

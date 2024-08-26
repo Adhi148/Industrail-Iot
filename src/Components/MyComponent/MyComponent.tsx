@@ -7,14 +7,8 @@ import {
   PageData,
   DashboardQueryParams,
 } from '../../types/thingsboardTypes';
-import { login, logout } from '../../api/loginApi';
-import {
-  deleteDevice,
-  getDeviceInfoById,
-  getDevicePublishTelemetryCommands,
-  getTenantDevices,
-  saveDevice,
-} from '../../api/deviceApi';
+import { getCurrentUser } from '../../api/loginApi';
+import { getTenantDevices, saveDevice } from '../../api/deviceApi';
 import { getTenantDashboards, saveDashboard } from '../../api/dashboardApi';
 import { getUsers, saveUser } from '../../api/userApi';
 import {
@@ -22,17 +16,9 @@ import {
   getWidgetsBundles,
 } from '../../api/widgetsBundleAPI';
 import { getDeviceProfileNames } from '../../api/deviceProfileAPIs';
-// import { generateUUIDv1 } from '../../Utility/utility_functions';
+import { customerId, tenantId } from '../../Utility/utility_functions';
 
 const MyComponent: React.FC = () => {
-  // const uuid = generateUUIDv1()
-  // console.log(uuid)
-
-  // State for login
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [loginError, setLoginError] = useState<string | null>(null);
-
   // State for device creation
   const [deviceName, setDeviceName] = useState<string>('');
   const [deviceType, setDeviceType] = useState<string>('');
@@ -95,23 +81,6 @@ const MyComponent: React.FC = () => {
     }
   };
 
-  // Handle login
-  const handleLogin = async () => {
-    try {
-      await login(username, password);
-      alert('Login successful!');
-      setLoginError(null);
-    } catch (error: any) {
-      setLoginError(error.message || 'Login failed');
-    }
-  };
-
-  // Handle logout
-  const handleLogout = () => {
-    logout();
-    alert('Logout successful!');
-  };
-
   // Handle device creation
   const handleCreateDevice = async () => {
     try {
@@ -148,20 +117,18 @@ const MyComponent: React.FC = () => {
   const handleCreateUser = async () => {
     try {
       const newUser: User = {
-        // id: {
-        //   entityType: "USER"
-        // },
-        email: 'iamniyazahmad777@gmail.com',
-        authority: 'TENANT_ADMIN', // Use one of the accepted authority values
+        email: 'user34@example.com',
+        authority: 'TENANT_ADMIN',
         firstName: 'John',
         lastName: 'Doe',
-        phone: '38012345123', // Change to string
+        phone: '38012345123',
         additionalInfo: {},
+
       };
-      await saveUser(newUser, sendActivationMail); // Assuming `sendActivationMail` is true
+      await saveUser(newUser, true); // Assuming `sendActivationMail` is true
       setNewUsername('');
       alert('User created successfully!');
-      fetchUsers(0); // Optionally refetch users
+      fetchUsers(0);
     } catch (error: any) {
       setUserError('Failed to create user: ' + error.message); // Display error message
     }
@@ -191,7 +158,7 @@ const MyComponent: React.FC = () => {
   };
 
   // Fetch devices
-  const fetchDeviceProfileNames = async (activeOnly) => {
+  const fetchDeviceProfileNames = async (activeOnly: boolean) => {
     try {
       const names = await getDeviceProfileNames(activeOnly);
       setDeviceProfileNames(names);
@@ -216,7 +183,6 @@ const MyComponent: React.FC = () => {
       const response: PageData<DashboardType> = await getTenantDashboards(
         params
       );
-
       setDashboards(response.data ?? []);
     } catch (error) {
       console.error('Failed to fetch dashboards', error);
@@ -230,7 +196,9 @@ const MyComponent: React.FC = () => {
     try {
       setLoadingUsers(true);
       const response: PageData<User> = await getUsers(page);
+
       setUsers(response.data || []);
+      console.log(response.data)
     } catch (error) {
       console.error('Failed to fetch users', error);
       setUserError('Failed to fetch users');
@@ -246,6 +214,8 @@ const MyComponent: React.FC = () => {
     fetchAllWidgetBundles();
     fetchWidgetBundles(currentWidgetPage);
     fetchDeviceProfileNames(false);
+    const response = await getCurrentUser();
+    console.log(response);
   };
 
   const handlePageChangeWidgets = (page: number) => {
@@ -269,26 +239,6 @@ const MyComponent: React.FC = () => {
     <div className="menu-data" style={{ padding: '10px' }}>
       <h1>MyComponent</h1>
       <button onClick={handleGetAll}>Get Data</button>
-
-      {/* Login Form */}
-      <div>
-        <h2>Login</h2>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-        />
-        <button onClick={handleLogin}>Login</button>
-        <button onClick={handleLogout}>Logout</button>
-        {loginError && <p>{loginError}</p>}
-      </div>
 
       {/* Create Device */}
       <div>
@@ -361,10 +311,10 @@ const MyComponent: React.FC = () => {
       <div>
         <h2>Device Profiles</h2>
         <ul>
-            {deviceProfileNames.map((deviceProfile) => (
-              <li key={deviceProfile.id.id}>{deviceProfile.name}</li>
-            ))}
-          </ul>
+          {deviceProfileNames.map((deviceProfile) => (
+            <li key={deviceProfile.id.id}>{deviceProfile.name}</li>
+          ))}
+        </ul>
         )
       </div>
 
@@ -390,7 +340,7 @@ const MyComponent: React.FC = () => {
         ) : (
           <ul>
             {users.map((user) => (
-              <li key={user.id.id}>
+              <li key={user.id?.id}>
                 {user.email}({user.authority})
               </li>
             ))}

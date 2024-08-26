@@ -83,13 +83,15 @@ export interface PageData<T> {
 // User types
 export interface User {
   id?: any;
+  customerId?: any;
+  tenantId?: any;
   firstName?: string;
   lastName?: string;
   email?: string;
+  name?: string;
   authority?: string;
-  additionalInfo?: any;
+  additionalInfo?: Object;
   phone?: string,
-
 }
 
 export interface UserSettings {
