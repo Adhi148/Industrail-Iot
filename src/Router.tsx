@@ -20,6 +20,10 @@ import Accountinfo from "./Components/AccountInfo/Accountinfo";
 
 const Router = createBrowserRouter([
     {
+        path: '/login',
+        element: <Login />,
+    },
+    {
         path: '/',
         element: <App />,
         children: [
@@ -88,10 +92,6 @@ const Router = createBrowserRouter([
                 element:<Accountinfo/>
             }
         ]
-    },
-    {
-        path: '/login',
-        element: <Login />,
     }
 ]);
 

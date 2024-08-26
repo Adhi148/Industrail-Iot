@@ -1,6 +1,6 @@
 import "./Menubar.css"
 import SpeedIcon from '@mui/icons-material/Speed';
-import PieChartIcon from '@mui/icons-material/PieChart';
+import PieChartIcon from '@mui/icons-material/PieChart'; 
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import CableIcon from '@mui/icons-material/Cable';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -12,16 +12,22 @@ import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
-import { useEffect } from "react";
+import { useEffect} from "react";
+import { useSelector } from "react-redux";
 
 const Menubar = () => {
 
+    const deviceCount = useSelector((state : any) => state.user.deviceCount)
+
+    
     useEffect(() => {
         document.body.style.overflowX = 'hidden';
         return () => {
             document.body.style.overflowX = '';
         };
     }, []);
+
+ 
 
 
     return (
@@ -41,7 +47,7 @@ const Menubar = () => {
                         <li><ElectricBoltIcon className="speedicon" />Actions <span className="count">3</span></li>
                     </Link>
                     <Link to="/devices" className="link">
-                        <li><CableIcon className="speedicon" />Devices <span className="count">6</span></li>
+                        <li><CableIcon className="speedicon" />Devices <span className="count">{deviceCount}</span></li>
                     </Link>
                     <Link to="/locations" className="link">
                         <li><LocationOnIcon className="speedicon" />Locations <span className="count">3</span></li>

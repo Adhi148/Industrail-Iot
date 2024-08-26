@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../api/loginApi';
-import './Login.css'; // Ensure this CSS file contains the provided styles
+import './Login.css';
 import waveImg from '../../assets/wave.png';
 import bgImg from '../../assets/bg.svg';
 import avatarImg from '../../assets/avatar.svg';
@@ -10,6 +9,9 @@ import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
 import Slide, { SlideProps } from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
+import { useDispatch } from 'react-redux';
+import { set_Accesstoken } from '../../Redux/Action/Action';
+import thingsboardAPI from "../../api/thingsboardAPI";
 
 function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="down" />;
@@ -18,13 +20,14 @@ function SlideTransition(props: SlideProps) {
 const Login: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false); // State for loading
-    const [snackbarMessage, setSnackbarMessage] = useState<string>(''); // State for Snackbar message
-    const [snackbarStyle, setSnackbarStyle] = useState<React.CSSProperties>({}); // State for Snackbar style
+    const [loading, setLoading] = useState<boolean>(false);
+    const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+    const [snackbarStyle, setSnackbarStyle] = useState<React.CSSProperties>({});
     const navigate = useNavigate();
     const usernameRef = useRef<HTMLInputElement>(null);
+    const dispatch = useDispatch();
 
-    const [state, setState] = React.useState<{
+    const [state, setState] = useState<{
         open: boolean;
         Transition: React.ComponentType<
             TransitionProps & {
@@ -36,44 +39,50 @@ const Login: React.FC = () => {
         Transition: SlideTransition,
     });
 
+
+    const login = async (
+        username: string,
+        password: string
+    ): Promise<string> => {
+        try {
+            const response = await thingsboardAPI.post<{ token: string }>(
+                '/auth/login',
+                { username, password }
+            );
+            const token = response.data.token;
+            localStorage.setItem('token', token);
+            dispatch(set_Accesstoken(token));
+            return token;
+        } catch (error) {
+            console.error('Login failed', error);
+            throw error;
+        }
+    };
+
+
+
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         setLoading(true);
 
         try {
             await login(username, password);
-            localStorage.setItem('username', username);
-            setTimeout(() => {
-                setSnackbarMessage('Login successful!');
-                setSnackbarStyle({ backgroundColor: 'green' });
-                setState({
-                    open: true,
-                    Transition: SlideTransition,
-                });
-                setTimeout(() => {
-                    setLoading(false);
-                    navigate('/dashboard', { state: username });
-                }, 1500);
-            }, 1000);
-        } catch (error) {
-            // Handle login error
-            setSnackbarMessage('Invalid username or password');
-            setSnackbarStyle({ backgroundColor: 'red' });
-            setState({
-                open: true,
-                Transition: SlideTransition,
-            });
+            setSnackbarMessage('Login successful!');
+            setSnackbarStyle({ backgroundColor: 'green' });
+            setState({ open: true, Transition: SlideTransition });
             setTimeout(() => {
                 setLoading(false);
+                navigate('/dashboard', { state: username });
             }, 1500);
-        } finally { setTimeout(() => {
+        } catch (error) {
+            setSnackbarMessage('Invalid username or password');
+            setSnackbarStyle({ backgroundColor: 'red' });
+            setState({ open: true, Transition: SlideTransition });
+            setTimeout(() => {
                 setLoading(false);
             }, 1500);
         }
     };
-
-
-
 
     useEffect(() => {
         if (usernameRef.current) {
@@ -168,7 +177,7 @@ const Login: React.FC = () => {
                             startIcon={<SaveIcon />}
                             variant="contained"
                             sx={{ width: '150px', height: '50px', marginTop: "40px" }}
-                            className='btn'
+                            className="btn"
                         >
                             <span>Login</span>
                         </LoadingButton>
@@ -178,9 +187,9 @@ const Login: React.FC = () => {
                             TransitionComponent={state.Transition}
                             message={snackbarMessage}
                             key={state.Transition.name}
-                            autoHideDuration={1500} // Snackbar duration
+                            autoHideDuration={1500}
                             ContentProps={{
-                                style: { ...snackbarStyle, textAlign: 'center' }, // Apply dynamic styles
+                                style: { ...snackbarStyle, textAlign: 'center' },
                             }}
                             anchorOrigin={{
                                 vertical: 'top',

@@ -8,19 +8,21 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import { Device } from "../../types/thingsboardTypes";
+import { saveDevice } from "../../api/deviceApi";
 
 const AddDevice = () => {
     const [loading, setLoading] = useState(false);
 
-    const [deviceType, setDeviceType] = useState('');
+    const [deviceType, setDeviceType] = useState('default');
     const [admin, setAdmin] = useState('');
     const [location, setLocation] = useState('');
     const [action, setAction] = useState('');
-    const [devicename, setDevicename] = useState('');
+    const [deviceName, setDevicename] = useState('');
     const [label, setLabel] = useState('');
 
     const device = {
-        "Devicename" : devicename,
+        "Devicename" : deviceName,
         "Label" : label,
         "Devicetype": deviceType,
         "Admin" : admin ,
@@ -28,7 +30,6 @@ const AddDevice = () => {
         "Location" : location
     };
 
-    console.log(device)
 
 
     const handleDeviceTypeChange = (event: SelectChangeEvent) => {
@@ -47,14 +48,27 @@ const AddDevice = () => {
         setAction(event.target.value);
     };
 
-    const handleClick = () => {
+
+    const handleClick = async () => {
         setLoading(true);
 
         setTimeout(() => {
             console.log("Data saved!");
             setLoading(false);
         }, 2000);
+
+        try {
+            const newDevice: Device = {
+                name: deviceName,
+                type: deviceType,
+            };
+            await saveDevice(newDevice);
+            setDevicename('');
+        } catch (error) {
+            console.log('Failed to create device');
+        }
     };
+
 
     return (
         <div className="menu-data">
@@ -87,10 +101,10 @@ const AddDevice = () => {
                             onChange={handleDeviceTypeChange}
                             className="form-control-inner"
                         >
-                            <MenuItem value="Default">
-                                <em>Default</em>
+                            <MenuItem value="default">
+                                <em>default</em>
                             </MenuItem>
-                            <MenuItem value={"Teperatue"}>Teperatue</MenuItem>
+                            <MenuItem value={"Teperatue"}>Teperatue</MenuItem> 
                         </Select>
                     </FormControl>
                     <label htmlFor="" className="label">Admin</label>
@@ -172,3 +186,5 @@ const AddDevice = () => {
 }
 
 export default AddDevice;
+
+
