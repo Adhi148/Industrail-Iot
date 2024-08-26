@@ -1,21 +1,28 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import SaveIcon from '@mui/icons-material/Save';
 import LoadingButton from '@mui/lab/LoadingButton';
 import "./Accountinfo.css";
+import { getCurrentUser } from "../../api/loginApi";
 
 const Accountinfo = () => {
-    const location = useLocation();
-    const [username, setUsername] = useState<string | null>(null);
+    const [username, setUsername] = useState<string>("");
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const userFromState = location.state?.username;
-        const userFromStorage = localStorage.getItem('username');
-        setUsername(userFromState || userFromStorage);
-    }, [location]);
+        const fetchUserData = async () => {
+            try {
+                const userData = await getCurrentUser();
+                setUsername(userData.email || "");
+            } catch (error) {
+                console.error('Failed to fetch user data', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
 
     const handleClick = () => {
         setLoading(true);

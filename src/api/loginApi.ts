@@ -1,11 +1,14 @@
+import { useDispatch } from "react-redux";
 import { User } from "../types/thingsboardTypes";
 import thingsboardAPI from "./thingsboardAPI";
+import { set_Accesstoken } from "../Redux/Action/Action";
 
-// Existing login function
+
 export const login = async (
   username: string,
   password: string
 ): Promise<string> => {
+  const dispatch = useDispatch();
   try {
     const response = await thingsboardAPI.post<{ token: string }>(
       '/auth/login',
@@ -13,6 +16,7 @@ export const login = async (
     );
     const token = response.data.token;
     localStorage.setItem('token', token);
+    dispatch(set_Accesstoken(token));
     return token;
   } catch (error) {
     console.error('Login failed', error);

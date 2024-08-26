@@ -1,21 +1,24 @@
 import "./Devices.css";
 import { useEffect, useState } from 'react';
 import { Device, DeviceQueryParams, PageData } from '../../types/thingsboardTypes';
-import { getTenantDevices } from '../../api/deviceApi';
+import { deleteDevice, getTenantDevices } from '../../api/deviceApi';
 import Loader from "../Loader/Loader";
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
-import CheckIcon from '@mui/icons-material/Check'; // Import the CheckIcon
-import thingsboardAPI from '../../api/thingsboardAPI';
+import CheckIcon from '@mui/icons-material/Check';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import React from "react";
 import SnackbarContent from '@mui/material/SnackbarContent';
+import { useDispatch } from "react-redux";
+import { set_DeviceCount } from "../../Redux/Action/Action";
+// import { getDeviceProfileNames } from "../../api/deviceProfileAPIs";
 
 const Devices: React.FC = () => {
     const [devices, setDevices] = useState<Device[]>([]);
     const [loadingDevices, setLoadingDevices] = useState<boolean>(false);
     const [open, setOpen] = React.useState(false);
+    const deviceCountDispatch = useDispatch();
 
     const fetchDevices = async (page: number): Promise<void> => {
         try {
@@ -39,24 +42,21 @@ const Devices: React.FC = () => {
 
         } catch (error) {
             console.error('Failed to fetch devices', error);
-            setLoadingDevices(false); // In case of error, immediately stop loading
+            setLoadingDevices(false); 
         }
     };
 
-    const deleteDevice = async (deviceId: string): Promise<void> => {
-        try {
-            await thingsboardAPI.delete(`/device/${deviceId}`);
-            fetchDevices(0);
-            handleClick();  // Trigger Snackbar on successful deletion
-        } catch (error) {
-            console.error('Failed to delete device', error);
-            throw error;
-        }
-    };
+    const handleDelete = async(id: string): Promise<void> =>{
+        await deleteDevice(id);
+        handleClick();
+        fetchDevices(0);
+
+    }
 
     const handleClick = () => {
         setOpen(true);
     };
+
 
     const handleClose = (
         event: React.SyntheticEvent | Event,
@@ -70,9 +70,29 @@ const Devices: React.FC = () => {
         setOpen(false);
     };
 
+    // const [deviceProfileNames, setDeviceProfileNames] = useState<any[]>([]);
+
+    // const fetchDeviceProfileNames = async () => {
+    //     try {
+    //         const names = await getDeviceProfileNames(true);
+    //         setDeviceProfileNames(names);
+    //         console.log(names)
+    //     } catch (error) {
+    //         console.error('Failed to load device profile names');
+    //     }
+    // };
+
+
+
+
     useEffect(() => {
         fetchDevices(0);
+        // fetchDeviceProfileNames();
     }, []);
+
+    useEffect(() => {
+        deviceCountDispatch(set_DeviceCount(devices.length));
+    }, [devices]);
 
     return (
         <div className="menu-data">
@@ -96,7 +116,7 @@ const Devices: React.FC = () => {
                                                     </IconButton>
                                                     <IconButton
                                                         aria-label="delete"
-                                                        onClick={() => deleteDevice(device.id?.id)}>
+                                                        onClick={() => handleDelete(device.id?.id)}>
                                                         <DeleteIcon className="delete-icon" />
                                                     </IconButton>
                                                 </div>
