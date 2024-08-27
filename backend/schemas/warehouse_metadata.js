@@ -1,5 +1,5 @@
-    const mongoose = require('mongoose')
-    const { type } = require('os')
+import mongoose from 'mongoose';
+import { type } from 'os';
 
 
     const warehouseSchema = new mongoose.Schema({
@@ -26,4 +26,4 @@
     })
 
     const warehouse = mongoose.model('warehouse_metadata', warehouseSchema);
-    module.exports = warehouse
+    export default warehouse;

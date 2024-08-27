@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import coolant from '../schemas/coolant_metadata.js'; // Ensure to use the .js extension or adjust based on your file structure
+import warehouse from '../schemas/warehouse_metadata.js'; // Ensure to use the .js extension or adjust based on your file structure
+
 const router = express.Router();
-const coolant = require('../schemas/coolant_metadata');
-const warehouse = require('../schemas/warehouse_metadata');
 
 // create a new coolant
 router.post('/addcoolant', async(req, res) =>{
@@ -53,4 +54,4 @@ router.get('/getavaliablecoolants', async(req, res) => {
     }
 })
 
-module.exports = router
+export default router
