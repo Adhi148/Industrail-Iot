@@ -145,6 +145,7 @@ const AddDevice = () => {
                                         label="Label"
                                         onChange={(e) => setLabel(e.target.value)}
                                         value={label}
+                                        className="textfiled"
                                     />
                                 </Box>
                                 <label htmlFor="" className="label">Type</label>

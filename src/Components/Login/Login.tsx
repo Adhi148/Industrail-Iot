@@ -14,7 +14,6 @@ import { set_Accesstoken } from '../../Redux/Action/Action';
 import thingsboardAPI from '../../api/thingsboardAPI';
 import Loader from '../Loader/Loader';
 
-// Slide transition component
 function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="down" />;
 }
@@ -78,22 +77,34 @@ const Login: React.FC = () => {
 
         try {
             await login(username, password);
-            setSnackbarMessage('Login successful!');
-            setSnackbarStyle({ backgroundColor: 'green' });
-            setState({ open: true, Transition: SlideTransition });
+
+            // Set success message and show it after the button finishes loading
             setTimeout(() => {
                 setLoading(false);
-                navigate('/dashboard', { state: username });
-            }, 1500);
+                setSnackbarMessage('Login successful!');
+                setSnackbarStyle({ backgroundColor: 'green' });
+                setState({ open: true, Transition: SlideTransition });
+
+                // Hide the success message after 1 second
+                setTimeout(() => {
+                    setState(prevState => ({ ...prevState, open: false }));
+                    navigate('/dashboard', { state: username });
+                }, 500);
+            }, 1000); 
+
         } catch (error) {
             setSnackbarMessage('Invalid username or password');
             setSnackbarStyle({ backgroundColor: 'red' });
+            setLoading(false);
             setState({ open: true, Transition: SlideTransition });
+
+            // Hide the error message after 1 second
             setTimeout(() => {
-                setLoading(false);
-            }, 1500);
+                setState(prevState => ({ ...prevState, open: false }));
+            }, 1000); // 1 second delay before hiding
         }
     };
+
 
     // Focus username input on mount
     useEffect(() => {
