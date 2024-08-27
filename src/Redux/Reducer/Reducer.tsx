@@ -7,6 +7,7 @@ interface Userstate {
 const initial_state: any = {
     // user: null ,
     accesstoken: null,
+    usercount : 0
 }
 
 const userReducer = (state = initial_state, action: any): Userstate => {
@@ -27,6 +28,11 @@ const userReducer = (state = initial_state, action: any): Userstate => {
             return {
                 ...state,
                 accesstoken : action.payload
+            }
+        case "SET_USER_COUNT":
+            return {
+                ...state,
+                userCount : action.payload
             }
         default :
             return state;

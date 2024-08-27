@@ -8,32 +8,28 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import { Device } from "../../types/thingsboardTypes";
-import { saveDevice } from "../../api/deviceApi";
+import { Device, DeviceQueryParams, PageData } from "../../types/thingsboardTypes";
+import { saveDevice, getTenantDevices } from "../../api/deviceApi";
 import Loader from "../Loader/Loader";
+import { useDispatch } from "react-redux";
+import { set_DeviceCount } from "../../Redux/Action/Action";
+import { Snackbar, SnackbarCloseReason, SnackbarContent } from "@mui/material";
+import CheckIcon from '@mui/icons-material/Check';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const AddDevice = () => {
     const [loading, setLoading] = useState(false);
-
     const [deviceType, setDeviceType] = useState('default');
     const [admin, setAdmin] = useState('');
     const [location, setLocation] = useState('');
     const [action, setAction] = useState('');
-    const [deviceName, setDevicename] = useState('');
+    const [deviceName, setDeviceName] = useState('');
     const [label, setLabel] = useState('');
     const [loaders, setLoaders] = useState(true);
-
-    console.log(label)
-
-    // const device = {
-    //     "Devicename" : deviceName,
-    //     "Label" : label,
-    //     "Devicetype": deviceType,
-    //     "Admin" : admin ,
-    //     "Action" : action ,
-    //     "Location" : location
-    // };
-
+    const deviceCountDispatch = useDispatch();
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState("");
+    const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
 
 
     const handleDeviceTypeChange = (event: SelectChangeEvent) => {
@@ -54,38 +50,82 @@ const AddDevice = () => {
 
     setTimeout(() => {
         setLoaders(false);
-    }, 1000)
+    }, 1000);
 
+
+    const fetchDevices = async (page: number): Promise<void> => {
+        try {
+
+            const params: DeviceQueryParams = {
+                pageSize: 10,
+                page: page,
+                type: 'default',
+                textSearch: '',
+                sortProperty: 'name',
+                sortOrder: 'ASC',
+            };
+
+            const response: PageData<Device> = await getTenantDevices(params);
+            deviceCountDispatch(set_DeviceCount(response.totalElements || 0));
+        } catch (error) {
+            console.error('Failed to fetch devices', error);
+        }
+    };
 
     const handleClick = async () => {
         setLoading(true);
-
-        setTimeout(() => {
-            console.log("Data saved!");
-            setLoading(false);
-        }, 2000);
-
-
-        
 
         try {
             const newDevice: Device = {
                 name: deviceName,
                 type: deviceType,
             };
-            await saveDevice(newDevice);
-            setDevicename('');
 
+            await saveDevice(newDevice);
+            await fetchDevices(0);
+
+            setTimeout(() => {
+                setDeviceName('');
+                setDeviceType('default');
+                setAdmin('');
+                setLocation('');
+                setAction('');
+                setLabel('');
+                setLoading(false);
+                setMessage("Device added successfully!");
+                setSnackbarType('success');
+                setOpen(true);
+            }, 500);
         } catch (error) {
             console.log('Failed to create device');
+            setTimeout(() => {
+                setLoading(false);
+                setMessage("Device Already Exist");
+                setSnackbarType('error');
+                setOpen(true);
+            }, 500)
         }
     };
+
+
+    const handleClose = (
+        event: React.SyntheticEvent | Event,
+        reason?: SnackbarCloseReason,
+    ) => {
+        if (reason === 'clickaway') {
+            event
+            return;
+        }
+
+        setOpen(false);
+    };
+
 
 
     return (
         <>
             {
-                loaders ? (<Loader/>):(
+                loaders ? (<Loader />) : (
                     <div className="menu-data">
                         <div className="add-device">
                             <form>
@@ -94,7 +134,8 @@ const AddDevice = () => {
                                     <TextField
                                         fullWidth
                                         label="Name"
-                                        onChange={(e) => setDevicename(e.target.value)}
+                                        onChange={(e) => setDeviceName(e.target.value)}
+                                        value={deviceName}
                                     />
                                 </Box>
                                 <label htmlFor="" className="label">Label</label>
@@ -103,6 +144,7 @@ const AddDevice = () => {
                                         fullWidth
                                         label="Label"
                                         onChange={(e) => setLabel(e.target.value)}
+                                        value={label}
                                     />
                                 </Box>
                                 <label htmlFor="" className="label">Type</label>
@@ -119,7 +161,7 @@ const AddDevice = () => {
                                         <MenuItem value="default">
                                             <em>default</em>
                                         </MenuItem>
-                                        <MenuItem value={"Teperatue"}>Teperatue</MenuItem>
+                                        <MenuItem value={"Temperature"}>Temperature</MenuItem>
                                     </Select>
                                 </FormControl>
                                 <label htmlFor="" className="label">Admin</label>
@@ -196,15 +238,31 @@ const AddDevice = () => {
                                 </div>
                             </form>
                         </div>
+                        <Snackbar
+                            open={open}
+                            autoHideDuration={2000}
+                            onClose={handleClose}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            style={{ marginTop: '64px' }}
+                        >
+                            <SnackbarContent
+                                style={{
+                                    backgroundColor: snackbarType === 'success' ? 'green' : 'red',
+                                    color: 'white'
+                                }}
+                                message={
+                                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                                        {snackbarType === 'success' ? <CheckIcon style={{ marginRight: '8px' }} /> : <ErrorIcon style={{ marginRight: '8px' }} />}
+                                        {message}
+                                    </span>
+                                }
+                            />
+                        </Snackbar>
                     </div>
-            )
-        }
+                )
+            }
         </>
-        
-        
     );
 }
 
 export default AddDevice;
-
-

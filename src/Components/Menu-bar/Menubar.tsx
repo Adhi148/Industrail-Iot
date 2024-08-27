@@ -12,18 +12,14 @@ import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
-import { useEffect, useState} from "react";
-import { getUsers } from "../../api/userApi";
-import { Device, DeviceQueryParams, PageData } from "../../types/thingsboardTypes";
-import { getTenantDevices } from "../../api/deviceApi";
+import { useEffect} from "react";
+import { useSelector } from "react-redux";
 
-interface user {
-    email: string,
-    additionalInfo: any
-    lastLoginTs: number
-}
 const Menubar = () => {
-    
+
+    const deviceCount = useSelector((state: any) => state.user.deviceCount);
+    const userCount = useSelector((state: any) => state.user.userCount);
+
     useEffect(() => {
         document.body.style.overflowX = 'hidden';
         return () => {
@@ -31,47 +27,7 @@ const Menubar = () => {
         };
     }, []);
 
-    const [userdata, setUserdata] = useState<user[]>([]);
-    const [devices, setDevices] = useState<Device[]>([]);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const userData = await getUsers(0);
-                console.log(userData.data);
-                setUserdata(userData.data);
-            } catch (error) {
-                console.error('Failed to fetch user data', error);
-            }
-        };
-
-        fetchUserData();
-    }, []);
-
-    useEffect(() => {
-        const fetchDevices = async (page: number): Promise<void> => {
-            try {
-
-                const params: DeviceQueryParams = {
-                    pageSize: 10,
-                    page: page,
-                    type: 'default',
-                    textSearch: '',
-                    sortProperty: 'name',
-                    sortOrder: 'ASC',
-                };
-
-                const response: PageData<Device> = await getTenantDevices(params);
-                setDevices(response.data || []);
-
-
-            } catch (error) {
-                console.error('Failed to fetch devices', error);
-            }
-        };
-
-        fetchDevices(0)
-    }, [])
     
 
  
@@ -94,7 +50,7 @@ const Menubar = () => {
                         <li><ElectricBoltIcon className="speedicon" />Actions <span className="count">3</span></li>
                     </Link>
                     <Link to="/devices" className="link">
-                        <li><CableIcon className="speedicon" />Devices <span className="count">{devices.length}</span></li>
+                        <li><CableIcon className="speedicon" />Devices <span className="count">{deviceCount}</span></li>
                     </Link>
                     <Link to="/locations" className="link">
                         <li><LocationOnIcon className="speedicon" />Locations <span className="count">3</span></li>
@@ -106,7 +62,7 @@ const Menubar = () => {
                         <li><LocalShippingIcon className="speedicon" />Vehicles <span className="count">3</span></li>
                     </Link>
                     <Link to="/users" className="link">
-                        <li><GroupIcon className="speedicon" />Users <span className="count">{userdata.length}</span></li>
+                        <li><GroupIcon className="speedicon" />Users <span className="count">{userCount}</span></li>
                     </Link>
                     <li className="quick-action">Quick Actions</li>
                     <Link to="/addDevice" className="link">

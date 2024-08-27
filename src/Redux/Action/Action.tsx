@@ -20,3 +20,10 @@ export const set_DeviceCount = (device : number) => {
         payload : device
     }
 }
+
+export const set_usersCount = (user : number) => {
+    return{
+        type : "SET_USER_COUNT" ,
+        payload : user
+    }
+}
