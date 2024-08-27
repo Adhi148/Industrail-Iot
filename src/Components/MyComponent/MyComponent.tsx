@@ -12,20 +12,21 @@ import {
 import { getCurrentUser } from '../../api/loginApi';
 import { getTenantDevices } from '../../api/deviceApi';
 import { getTenantDashboards, saveDashboard } from '../../api/dashboardApi';
-import { getActivationLink, getUsers, saveUser } from '../../api/userApi';
+import { getActivationLink, getUsers, saveUser, sendActivationMail } from '../../api/userApi';
 import {
   getAllWidgetsBundles,
   getWidgetsBundles,
 } from '../../api/widgetsBundleAPI';
 import { getDeviceProfileNames } from '../../api/deviceProfileAPIs';
 import { createOrUpdateCustomer, getCustomers, getTenantCustomerByTitle } from '../../api/customerAPI';
+import { getTenantById } from '../../api/tenantAPI';
 
 const MyComponent: React.FC = () => {
   // State for dashboard creation
   const [dashboardTitle, setDashboardTitle] = useState<string>('');
   const [dashboardError, setDashboardError] = useState<string | null>(null);
 
-  const [sendActivationMail, setSendActivationMail] = useState<boolean>(false);
+  const [IsSendActivationMail, setIsSendActivationMail] = useState<boolean>(false);
   const [userError, setUserError] = useState<string | null>(null);
 
   // State for devices
@@ -51,6 +52,8 @@ const MyComponent: React.FC = () => {
 
   const [title, setTitle] = useState<string>('');
   const [email, setEmail] = useState<string>('');
+
+  const [tenant, setTenant] = useState<User>({})
 
   // Fetch widget bundles with parameters
   const fetchAllWidgetBundles = async () => {
@@ -102,6 +105,9 @@ const MyComponent: React.FC = () => {
   // Handle user creation
   const handleCreateUser = async () => {
     try {
+      const currentuser: User = await getCurrentUser();
+      const tenant = await getTenantById(currentuser.tenantId.id)
+      setTenant(tenant)
       const newUser: User = {
         email: email,
         authority: 'TENANT_ADMIN',
@@ -110,7 +116,7 @@ const MyComponent: React.FC = () => {
         phone: '',
         additionalInfo: {},
       };
-      const user = await saveUser(newUser, sendActivationMail);
+      const user = await saveUser(newUser, IsSendActivationMail);
       console.log(user);
       const activationlink = await getActivationLink(user.id.id);
       console.log(activationlink);
@@ -207,7 +213,6 @@ const MyComponent: React.FC = () => {
       const response: PageData<Customer> = await getCustomers(params);
 
       setUsers(response.data || []);
-      console.log(response.data);
     } catch (error) {
       console.error('Failed to fetch users', error);
     }
@@ -220,7 +225,7 @@ const MyComponent: React.FC = () => {
     fetchWidgetBundles(currentWidgetPage);
     fetchDeviceProfileNames(false);
     const response = await getCurrentUser();
-    console.log(response);
+    console.log("Current User: \n",response);
     fetchCustomers(0);
   };
 
@@ -305,6 +310,11 @@ const MyComponent: React.FC = () => {
       <div>
         <h2>Create Tenant User</h2>
         <input
+            type="text"
+            placeholder="Tenant"
+            value={tenant.name}
+          />
+        <input
           type="email"
           placeholder="Email"
           value={email}
@@ -315,8 +325,8 @@ const MyComponent: React.FC = () => {
         <label>
           <input
             type="checkbox"
-            checked={sendActivationMail}
-            onChange={(e) => setSendActivationMail(e.target.checked)}
+            checked={IsSendActivationMail}
+            onChange={(e) => setIsSendActivationMail(e.target.checked)}
           />
           Send Activation Mail
         </label>
@@ -346,8 +356,8 @@ const MyComponent: React.FC = () => {
           <label>
             <input
               type="checkbox"
-              checked={sendActivationMail}
-              onChange={(e) => setSendActivationMail(e.target.checked)}
+              checked={IsSendActivationMail}
+              onChange={(e) => setIsSendActivationMail(e.target.checked)}
             />
             Send Activation Mail
           </label>

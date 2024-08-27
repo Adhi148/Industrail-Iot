@@ -22,7 +22,7 @@ const App = () => {
       if (!token || accesstoken !== token) {
         navigate('/login');
       } else {
-        navigate('/dashboard');
+        navigate('/dashboards');
       }
     };
 
