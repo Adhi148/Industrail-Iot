@@ -10,7 +10,6 @@ import { DashboardQueryParams, DashboardType, PageData } from '../../types/thing
 import { deleteDashboard, getTenantDashboards } from '../../api/dashboardApi';
 
 const Dashboard = () => {
-  // State for dashboards
   const [dashboards, setDashboards] = useState<DashboardType[]>([]);
   const [loadingDashboards, setLoadingDashboards] = useState<boolean>(false);
   const [open, setOpen] = useState(false);

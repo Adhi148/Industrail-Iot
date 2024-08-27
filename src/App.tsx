@@ -12,27 +12,25 @@ const App = () => {
     const location = useLocation();
     const [loading, setLoading] = useState(true);
     const accesstoken = useSelector((state: any) => state.user.accesstoken);
-    const nodeRef = useRef(null); // Add a ref for CSSTransition
+    const nodeRef = useRef(null);
 
     useEffect(() => {
-        const validateToken = async () => {
-            const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
 
-            if (!token || accesstoken !== token) {
-                navigate('/login');
-            } else {
-                navigate('/dashboard');
-            }
-        };
-
-        validateToken().finally(() => setLoading(false));
-    }, [navigate, accesstoken]);
+        if (!token || accesstoken !== token) {
+            navigate('/login');
+        } else {
+            // Token is valid, proceed to dashboard or remain on the current page
+            setLoading(false);
+            navigate(location.pathname);
+        }
+    }, [navigate, accesstoken, location.pathname]);
 
     useEffect(() => {
         let lastActivity = Date.now();
         const checkActivity = () => {
             const now = Date.now();
-            if (now - lastActivity > 600000) {
+            if (now - lastActivity > 600000) { // 10 minutes
                 localStorage.clear();
                 navigate('/login');
             }
@@ -46,7 +44,7 @@ const App = () => {
         window.addEventListener('keydown', handleActivity);
         window.addEventListener('mousemove', handleActivity);
 
-        const intervalId = setInterval(checkActivity, 60000);
+        const intervalId = setInterval(checkActivity, 60000); // Check every minute
 
         return () => {
             window.removeEventListener('click', handleActivity);
