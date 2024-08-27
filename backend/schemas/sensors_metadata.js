@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
+import { type } from 'os';
 
 const sensorSchema = mongoose.Schema({
     sensor_id : {type : String, required : true},
@@ -9,4 +10,4 @@ const sensorSchema = mongoose.Schema({
 
 const sensor = mongoose.model('sensor_meatadata', sensorSchema);
 
-module.exports = sensor;
+export default sensor;

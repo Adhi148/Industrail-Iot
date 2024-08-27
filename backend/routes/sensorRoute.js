@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import sensor from '../schemas/sensors_metadata.js'; // Make sure to include the .js extension or adjust based on your file structure
+import warehouse from '../schemas/warehouse_metadata.js'; // Make sure to include the .js extension or adjust based on your file structure
+import { model } from 'mongoose';
+
 const router = express.Router();
-const sensor = require('../schemas/sensors_metadata');
-const warehouse = require('../schemas/warehouse_metadata')
-const { model } = require('mongoose');
 
 // create a new sensor
 router.post('/addsensor', async(req, res) => {
@@ -53,4 +54,4 @@ router.get('/getavaliablesensors', async(req, res) => {
     }
 })
 
-module.exports = router;
+export default router;

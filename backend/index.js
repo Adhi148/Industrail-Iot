@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
 
 
 const app = express();
@@ -18,13 +18,15 @@ mongoose.connect(mongoUri)
     console.log("Error connecting to MongoDB", error)
 });
 
-const warehouseRouter = require('./routes/warehouseRoute');
-const coolantRouter = require('./routes/coolantRoute');
-const sensorRouter = require('./routes/sensorRoute');
+import warehouseRouter from './routes/warehouseRoute.js'; 
+import coolantRouter from './routes/coolantRoute.js'; 
+import sensorRouter from './routes/sensorRoute.js'; 
+import vehicleRouter from './routes/vehicleRoute.js'; 
 
 app.use('/warehouse', warehouseRouter)
 app.use('/coolant', coolantRouter)
 app.use('/sensor',sensorRouter)
+app.use('/vehicle',vehicleRouter)
 
 
 app.listen(2000, ()=>{

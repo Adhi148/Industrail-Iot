@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const { type } = require('os')
+import mongoose from 'mongoose';
+import { type } from 'os';
 
 const coolantSchema = mongoose.Schema({
     coolant_id : {type : String, required: true},
@@ -7,4 +7,4 @@ const coolantSchema = mongoose.Schema({
 })
 
 const coolant = mongoose.model('coolant_metadata', coolantSchema);
-module.exports = coolant;
+export default coolant;
