@@ -37,10 +37,11 @@ router.get('/getallwarehouse', async(req, res) => {
     }
 });
 
-
-router.get('/getwarehouse/:id', async(req, res) => {
+// get warehouse by warehouse_id
+router.get('/getwarehouse/:warehouse_id', async(req, res) => {
     try {
-        const getwarehouse = await warehouse.findById(req.params.id)
+        const { warehouse_id } = req.params;
+        const getwarehouse = await warehouse.findOne({ warehouse_id })
         .populate({
             path: 'cooling_units.coolant',
             select: 'coolant_id location_in_warehouse'  
