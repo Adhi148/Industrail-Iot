@@ -5,26 +5,20 @@ import {
 } from '../types/thingsboardTypes';
 import thingsboardAPI from './thingsboardAPI';
 
-// Define default page size
-const DEFAULT_PAGE_SIZE = 20; // Set the default page size you want
-
 // Get Customer Users
 export const getCustomerUsers = async (
   customerId: string,
-  page: number,
-  textSearch: string = '',
-  sortProperty: string = 'createdTime',
-  sortOrder: string = 'ASC'
+  params: {
+    pageSize: number;
+    page: number;
+    textSearch?: string;
+    sortProperty?: string;
+    sortOrder?: string;
+  }
 ) => {
   try {
     const response = await thingsboardAPI.get(`/customer/${customerId}/users`, {
-      params: {
-        pageSize: DEFAULT_PAGE_SIZE,
-        page,
-        textSearch,
-        sortProperty,
-        sortOrder,
-      },
+      params: params,
     });
     return response.data;
   } catch (error) {
@@ -36,20 +30,17 @@ export const getCustomerUsers = async (
 // Get Tenant Users
 export const getTenantAdmins = async (
   tenantId: string,
-  page: number,
-  textSearch: string = '',
-  sortProperty: string = 'createdTime',
-  sortOrder: string = 'ASC'
+  params: {
+    pageSize: number;
+    page: number;
+    textSearch?: string;
+    sortProperty?: string;
+    sortOrder?: string;
+  }
 ) => {
   try {
     const response = await thingsboardAPI.get(`/tenant/${tenantId}/users`, {
-      params: {
-        pageSize: DEFAULT_PAGE_SIZE,
-        page,
-        textSearch,
-        sortProperty,
-        sortOrder,
-      },
+      params: params,
     });
     return response.data;
   } catch (error) {
@@ -57,7 +48,6 @@ export const getTenantAdmins = async (
     throw new Error('Unable to fetch tenant users. Please try again later.');
   }
 };
-
 
 // Save or Update User
 export const saveUser = async (
@@ -264,21 +254,16 @@ export const isUserTokenAccessEnabled = async () => {
 };
 
 // Get Users
-export const getUsers = async (
-  page: number,
-  textSearch: string = '',
-  sortProperty: string = 'createdTime',
-  sortOrder: string = 'ASC'
-) => {
+export const getUsers = async (params: {
+  pageSize: number;
+  page: number;
+  textSearch?: string;
+  sortProperty?: string;
+  sortOrder?: string;
+}) => {
   try {
     const response = await thingsboardAPI.get(`/users`, {
-      params: {
-        pageSize: DEFAULT_PAGE_SIZE,
-        page,
-        textSearch,
-        sortProperty,
-        sortOrder,
-      },
+      params: params,
     });
     return response.data;
   } catch (error) {
@@ -290,20 +275,17 @@ export const getUsers = async (
 // Get Users for Assign
 export const getUsersForAssign = async (
   alarmId: string,
-  page: number,
-  textSearch: string = '',
-  sortProperty: string = 'createdTime',
-  sortOrder: string = 'ASC'
+  params: {
+    pageSize: number;
+    page: number;
+    textSearch?: string;
+    sortProperty?: string;
+    sortOrder?: string;
+  }
 ) => {
   try {
     const response = await thingsboardAPI.get(`/users/assign/${alarmId}`, {
-      params: {
-        pageSize: DEFAULT_PAGE_SIZE,
-        page,
-        textSearch,
-        sortProperty,
-        sortOrder,
-      },
+      params: params,
     });
     return response.data;
   } catch (error) {
@@ -315,21 +297,16 @@ export const getUsersForAssign = async (
 };
 
 // Find Users by Query
-export const findUsersByQuery = async (
-  page: number,
-  textSearch: string = '',
-  sortProperty: string = 'createdTime',
-  sortOrder: string = 'ASC'
-) => {
+export const findUsersByQuery = async (params: {
+  pageSize: number;
+  page: number;
+  textSearch?: string;
+  sortProperty?: string;
+  sortOrder?: string;
+}) => {
   try {
     const response = await thingsboardAPI.get(`/users/query`, {
-      params: {
-        pageSize: DEFAULT_PAGE_SIZE,
-        page,
-        textSearch,
-        sortProperty,
-        sortOrder,
-      },
+      params: params,
     });
     return response.data;
   } catch (error) {
