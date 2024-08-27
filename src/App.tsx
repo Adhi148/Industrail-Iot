@@ -49,6 +49,7 @@ const App = () => {
 
     const intervalId = setInterval(checkActivity, 60000);
 
+
     return () => {
       window.removeEventListener('click', handleActivity);
       window.removeEventListener('keydown', handleActivity);

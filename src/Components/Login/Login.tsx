@@ -11,8 +11,10 @@ import Slide, { SlideProps } from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import { useDispatch } from 'react-redux';
 import { set_Accesstoken } from '../../Redux/Action/Action';
-import thingsboardAPI from "../../api/thingsboardAPI";
+import thingsboardAPI from '../../api/thingsboardAPI';
+import Loader from '../Loader/Loader';
 
+// Slide transition component
 function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="down" />;
 }
@@ -23,6 +25,7 @@ const Login: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [snackbarMessage, setSnackbarMessage] = useState<string>('');
     const [snackbarStyle, setSnackbarStyle] = useState<React.CSSProperties>({});
+    const [isLoading, setIsLoading] = useState<boolean>(true); // Added loading state
     const navigate = useNavigate();
     const usernameRef = useRef<HTMLInputElement>(null);
     const dispatch = useDispatch();
@@ -39,11 +42,7 @@ const Login: React.FC = () => {
         Transition: SlideTransition,
     });
 
-
-    const login = async (
-        username: string,
-        password: string
-    ): Promise<string> => {
+    const login = async (username: string, password: string): Promise<string> => {
         try {
             const response = await thingsboardAPI.post<{ token: string }>(
                 '/auth/login',
@@ -59,8 +58,7 @@ const Login: React.FC = () => {
         }
     };
 
-
-
+    // Handle login form submission
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         setLoading(true);
@@ -84,6 +82,7 @@ const Login: React.FC = () => {
         }
     };
 
+    // Focus username input on mount
     useEffect(() => {
         if (usernameRef.current) {
             setTimeout(() => {
@@ -92,32 +91,33 @@ const Login: React.FC = () => {
         }
     }, []);
 
+    // Add and remove focus class to input fields
     useEffect(() => {
-        const inputs = document.querySelectorAll<HTMLInputElement>(".input");
+        const inputs = document.querySelectorAll<HTMLInputElement>('.input');
 
         const addcl = function (this: HTMLInputElement) {
             const parent = this.parentNode?.parentNode as HTMLElement;
             if (parent) {
-                parent.classList.add("focus");
+                parent.classList.add('focus');
             }
         };
 
         const remcl = function (this: HTMLInputElement) {
             const parent = this.parentNode?.parentNode as HTMLElement;
-            if (parent && this.value === "") {
-                parent.classList.remove("focus");
+            if (parent && this.value === '') {
+                parent.classList.remove('focus');
             }
         };
 
         inputs.forEach((input) => {
-            input.addEventListener("focus", addcl);
-            input.addEventListener("blur", remcl);
+            input.addEventListener('focus', addcl);
+            input.addEventListener('blur', remcl);
         });
 
         return () => {
             inputs.forEach((input) => {
-                input.removeEventListener("focus", addcl);
-                input.removeEventListener("blur", remcl);
+                input.removeEventListener('focus', addcl);
+                input.removeEventListener('blur', remcl);
             });
         };
     }, []);
@@ -126,7 +126,29 @@ const Login: React.FC = () => {
         setState(prevState => ({ ...prevState, open: false }));
     };
 
-    return (
+    
+    useEffect(() => {
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 500); 
+    }, []);
+
+    useEffect(() => {
+        if (loading) {
+            const handleNavigation = (e: any) => {
+                e.preventDefault();
+                e.returnValue = '';
+            };
+            window.addEventListener('beforeunload', handleNavigation);
+            return () => {
+                window.removeEventListener('beforeunload', handleNavigation);
+            };
+        }
+    }, [loading]);
+
+    return isLoading ? (
+        <div className="loading"><Loader /></div>
+    ) : (
         <div className="login-page">
             <img className="wave" src={waveImg} alt="wave" />
             <div className="container">
