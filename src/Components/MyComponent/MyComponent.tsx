@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { act, useEffect, useState } from 'react';
 import {
   Device,
   DashboardType,
@@ -8,28 +8,22 @@ import {
   DashboardQueryParams,
 } from '../../types/thingsboardTypes';
 import { getCurrentUser } from '../../api/loginApi';
-import { getTenantDevices, saveDevice } from '../../api/deviceApi';
+import { getTenantDevices } from '../../api/deviceApi';
 import { getTenantDashboards, saveDashboard } from '../../api/dashboardApi';
-import { getUsers, saveUser } from '../../api/userApi';
+import { getActivationLink, getUsers, saveUser } from '../../api/userApi';
 import {
   getAllWidgetsBundles,
   getWidgetsBundles,
 } from '../../api/widgetsBundleAPI';
 import { getDeviceProfileNames } from '../../api/deviceProfileAPIs';
-import { customerId, tenantId } from '../../Utility/utility_functions';
 
 const MyComponent: React.FC = () => {
-  // State for device creation
-  const [deviceName, setDeviceName] = useState<string>('');
-  const [deviceType, setDeviceType] = useState<string>('');
-  const [deviceError, setDeviceError] = useState<string | null>(null);
 
   // State for dashboard creation
   const [dashboardTitle, setDashboardTitle] = useState<string>('');
   const [dashboardError, setDashboardError] = useState<string | null>(null);
 
-  // State for user creation
-  const [newUsername, setNewUsername] = useState<string>('');
+
   const [sendActivationMail, setSendActivationMail] = useState<boolean>(true);
   const [userError, setUserError] = useState<string | null>(null);
 
@@ -81,22 +75,6 @@ const MyComponent: React.FC = () => {
     }
   };
 
-  // Handle device creation
-  const handleCreateDevice = async () => {
-    try {
-      const newDevice: Device = {
-        name: deviceName,
-        type: deviceType,
-      };
-      await saveDevice(newDevice);
-      setDeviceName('');
-      // setDeviceType('');
-      // alert('Device created successfully!');
-      fetchDevices(0); // Optionally refetch devices
-    } catch (error) {
-      setDeviceError('Failed to create device');
-    }
-  };
 
   // Handle dashboard creation
   const handleCreateDashboard = async () => {
@@ -117,16 +95,17 @@ const MyComponent: React.FC = () => {
   const handleCreateUser = async () => {
     try {
       const newUser: User = {
-        email: 'user34@example.com',
+        email: 'user9@example.com',
         authority: 'TENANT_ADMIN',
         firstName: 'John',
         lastName: 'Doe',
         phone: '38012345123',
         additionalInfo: {},
-
       };
-      await saveUser(newUser, true); // Assuming `sendActivationMail` is true
-      setNewUsername('');
+      const user = await saveUser(newUser, false);
+      console.log(user)
+      const activationlink = await getActivationLink(user.id.id)
+      console.log(activationlink)
       alert('User created successfully!');
       fetchUsers(0);
     } catch (error: any) {
@@ -198,7 +177,7 @@ const MyComponent: React.FC = () => {
       const response: PageData<User> = await getUsers(page);
 
       setUsers(response.data || []);
-      console.log(response.data)
+      // console.log(response.data)
     } catch (error) {
       console.error('Failed to fetch users', error);
       setUserError('Failed to fetch users');
@@ -240,25 +219,6 @@ const MyComponent: React.FC = () => {
       <h1>MyComponent</h1>
       <button onClick={handleGetAll}>Get Data</button>
 
-      {/* Create Device */}
-      <div>
-        <h2>Create Device</h2>
-        <input
-          type="text"
-          value={deviceName}
-          onChange={(e) => setDeviceName(e.target.value)}
-          placeholder="Device Name"
-        />
-        <input
-          type="text"
-          value={deviceType}
-          onChange={(e) => setDeviceType(e.target.value)}
-          placeholder="Device Type"
-        />
-        <button onClick={handleCreateDevice}>Create Device</button>
-        {deviceError && <p>{deviceError}</p>}
-      </div>
-
       {/* Create Dashboard */}
       <div>
         <h2>Create Dashboard</h2>
@@ -275,12 +235,6 @@ const MyComponent: React.FC = () => {
       {/* Create User */}
       <div>
         <h2>Create User</h2>
-        <input
-          type="text"
-          value={newUsername}
-          onChange={(e) => setNewUsername(e.target.value)}
-          placeholder="Username"
-        />
         <label>
           <input
             type="checkbox"

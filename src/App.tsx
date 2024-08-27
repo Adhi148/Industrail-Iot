@@ -1,94 +1,98 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import Menubar from "./Components/Menu-bar/Menubar";
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import Menubar from './Components/Menu-bar/Menubar';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import "./App.css";
-import Header from "./Components/Header/Header";
-import { useEffect, useState, useRef } from "react";
-import Loader from "./Components/Loader/Loader";
-import { useSelector } from "react-redux";
+import './App.css';
+import Header from './Components/Header/Header';
+import { useEffect, useState, useRef } from 'react';
+import Loader from './Components/Loader/Loader';
+import { useSelector } from 'react-redux';
 
 const App = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [loading, setLoading] = useState(true);
-    const accesstoken = useSelector((state: any) => state.user.accesstoken);
-    const nodeRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const accesstoken = useSelector((state: any) => state.user.accesstoken);
+  const nodeRef = useRef(null); // Add a ref for CSSTransition
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
+  useEffect(() => {
+    const validateToken = async () => {
+      const token = localStorage.getItem('token');
+      console.log(token);
 
-        if (!token || accesstoken !== token) {
-            navigate('/login');
-        } else {
-            // Token is valid, proceed to dashboard or remain on the current page
-            setLoading(false);
-            navigate(location.pathname);
-        }
-    }, [navigate, accesstoken, location.pathname]);
+      if (!token || accesstoken !== token) {
+        navigate('/login');
+      } else {
+        navigate('/dashboard');
+      }
+    };
 
-    useEffect(() => {
-        let lastActivity = Date.now();
-        const checkActivity = () => {
-            const now = Date.now();
-            if (now - lastActivity > 600000) { // 10 minutes
-                localStorage.clear();
-                navigate('/login');
-            }
-        };
+    validateToken().finally(() => setLoading(false));
+  }, [navigate, accesstoken]);
 
-        const handleActivity = () => {
-            lastActivity = Date.now();
-        };
+  useEffect(() => {
+    let lastActivity = Date.now();
+    const checkActivity = () => {
+      const now = Date.now();
+      if (now - lastActivity > 600000) {
+        localStorage.clear();
+        navigate('/login');
+      }
+    };
 
-        window.addEventListener('click', handleActivity);
-        window.addEventListener('keydown', handleActivity);
-        window.addEventListener('mousemove', handleActivity);
+    const handleActivity = () => {
+      lastActivity = Date.now();
+    };
 
-        const intervalId = setInterval(checkActivity, 60000); // Check every minute
+    window.addEventListener('click', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('mousemove', handleActivity);
 
-        return () => {
-            window.removeEventListener('click', handleActivity);
-            window.removeEventListener('keydown', handleActivity);
-            window.removeEventListener('mousemove', handleActivity);
-            clearInterval(intervalId);
-        };
-    }, [navigate]);
+    const intervalId = setInterval(checkActivity, 60000);
 
-    useEffect(() => {
-        const currentPath = location.pathname;
-        sessionStorage.setItem('lastPath', currentPath);
-    }, [location]);
 
-    useEffect(() => {
-        const lastPath = sessionStorage.getItem('lastPath');
-        if (lastPath) {
-            navigate(lastPath);
-        }
-    }, [navigate]);
+    return () => {
+      window.removeEventListener('click', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('mousemove', handleActivity);
+      clearInterval(intervalId);
+    };
+  }, [navigate]);
 
-    if (loading) {
-        return <Loader />;
+  useEffect(() => {
+    const currentPath = location.pathname;
+    sessionStorage.setItem('lastPath', currentPath);
+  }, [location]);
+
+  useEffect(() => {
+    const lastPath = sessionStorage.getItem('lastPath');
+    if (lastPath) {
+      navigate(lastPath);
     }
+  }, [navigate]);
 
-    return (
-        <>
-            <Header />
-            <Menubar />
-            <TransitionGroup component={null}>
-                <CSSTransition
-                    key={location.pathname}
-                    classNames={{
-                        enter: 'page-enter',
-                        exit: 'page-exit',
-                    }}
-                    timeout={500}
-                    nodeRef={nodeRef}
-                >
-                    <Outlet />
-                </CSSTransition>
-            </TransitionGroup>
-        </>
-    );
+  if (loading) {
+    return <Loader />;
+  }
+
+  return (
+    <>
+      <Header />
+      <Menubar />
+      <TransitionGroup component={null}>
+        <CSSTransition
+          key={location.pathname}
+          classNames={{
+            enter: 'page-enter',
+            exit: 'page-exit',
+          }}
+          timeout={500}
+          nodeRef={nodeRef}
+        >
+          <Outlet />
+        </CSSTransition>
+      </TransitionGroup>
+    </>
+  );
 };
 
 export default App;
