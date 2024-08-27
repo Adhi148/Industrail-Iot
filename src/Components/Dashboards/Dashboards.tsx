@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check'; // Import the CheckIcon
-import './Dashboard.css';
+import './Dashboards.css';
 import { useEffect, useState } from 'react';
 import { DashboardQueryParams, DashboardType, PageData } from '../../types/thingsboardTypes';
 import { deleteDashboard, getTenantDashboards } from '../../api/dashboardApi';

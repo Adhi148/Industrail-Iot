@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
+import warehouse from '../schemas/warehouse_metadata.js'; // Make sure to add the .js extension or update the path based on your project structure
 const router = express.Router();
-const warehouse = require('../schemas/warehouse_metadata');
 
 // create a new warehouse
 router.post('/addwarehouse', async(req, res) =>{
@@ -13,6 +13,7 @@ router.post('/addwarehouse', async(req, res) =>{
     }
 });
 
+//  get all warehouses
 router.get('/getallwarehouse', async(req, res) => {
     try {
         const getallwarehouse = await warehouse.find()
@@ -35,6 +36,7 @@ router.get('/getallwarehouse', async(req, res) => {
         res.status(500).json({ message: 'Error retrieving warehouse data', error });
     }
 });
+
 
 router.get('/getwarehouse/:id', async(req, res) => {
     try {
@@ -59,4 +61,4 @@ router.get('/getwarehouse/:id', async(req, res) => {
     }
 });
 
-module.exports = router
+export default router

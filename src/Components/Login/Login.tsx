@@ -14,7 +14,6 @@ import { set_Accesstoken } from '../../Redux/Action/Action';
 import thingsboardAPI from '../../api/thingsboardAPI';
 import Loader from '../Loader/Loader';
 
-// Slide transition component
 function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="down" />;
 }
@@ -28,7 +27,21 @@ const Login: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true); // Added loading state
     const navigate = useNavigate();
     const usernameRef = useRef<HTMLInputElement>(null);
+    const passwordRef = useRef<HTMLInputElement>(null);
     const dispatch = useDispatch();
+    const [usernameFocused, setUsernameFocused] = useState<boolean>(false);
+    const [passwordFocused, setPasswordFocused] = useState<boolean>(false);
+
+    const handleFocus = (setter: React.Dispatch<React.SetStateAction<boolean>>) => () => {
+        setter(true);
+    };
+
+    // Handler for blur event
+    const handleBlur = (setter: React.Dispatch<React.SetStateAction<boolean>>) => (e: any) => {
+        if (e.target.value === '') {
+            setter(false);
+        }
+    };
 
     const [state, setState] = useState<{
         open: boolean;
@@ -58,29 +71,40 @@ const Login: React.FC = () => {
         }
     };
 
-    // Handle login form submission
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         setLoading(true);
 
         try {
             await login(username, password);
-            setSnackbarMessage('Login successful!');
-            setSnackbarStyle({ backgroundColor: 'green' });
-            setState({ open: true, Transition: SlideTransition });
+
+            // Set success message and show it after the button finishes loading
             setTimeout(() => {
                 setLoading(false);
-                navigate('/dashboard', { state: username });
-            }, 1500);
+                setSnackbarMessage('Login successful!');
+                setSnackbarStyle({ backgroundColor: 'green' });
+                setState({ open: true, Transition: SlideTransition });
+
+                // Hide the success message after 1 second
+                setTimeout(() => {
+                    setState(prevState => ({ ...prevState, open: false }));
+                    navigate('/dashboard', { state: username });
+                }, 500);
+            }, 1000); 
+
         } catch (error) {
             setSnackbarMessage('Invalid username or password');
             setSnackbarStyle({ backgroundColor: 'red' });
+            setLoading(false);
             setState({ open: true, Transition: SlideTransition });
+
+            // Hide the error message after 1 second
             setTimeout(() => {
-                setLoading(false);
-            }, 1500);
+                setState(prevState => ({ ...prevState, open: false }));
+            }, 1000); // 1 second delay before hiding
         }
     };
+
 
     // Focus username input on mount
     useEffect(() => {
@@ -91,33 +115,38 @@ const Login: React.FC = () => {
         }
     }, []);
 
-    // Add and remove focus class to input fields
     useEffect(() => {
-        const inputs = document.querySelectorAll<HTMLInputElement>('.input');
+        const inputs = [usernameRef.current, passwordRef.current];
 
-        const addcl = function (this: HTMLInputElement) {
-            const parent = this.parentNode?.parentNode as HTMLElement;
-            if (parent) {
+        const addFocusClass = (input: HTMLInputElement | null) => {
+            if (input) {
+                const parent = input.parentNode?.parentNode as HTMLElement;
                 parent.classList.add('focus');
             }
         };
 
-        const remcl = function (this: HTMLInputElement) {
-            const parent = this.parentNode?.parentNode as HTMLElement;
-            if (parent && this.value === '') {
-                parent.classList.remove('focus');
+        const removeFocusClass = (input: HTMLInputElement | null) => {
+            if (input) {
+                const parent = input.parentNode?.parentNode as HTMLElement;
+                if (input.value === '') {
+                    parent.classList.remove('focus');
+                }
             }
         };
 
         inputs.forEach((input) => {
-            input.addEventListener('focus', addcl);
-            input.addEventListener('blur', remcl);
+            if (input) {
+                input.addEventListener('focus', () => addFocusClass(input));
+                input.addEventListener('blur', () => removeFocusClass(input));
+            }
         });
 
         return () => {
             inputs.forEach((input) => {
-                input.removeEventListener('focus', addcl);
-                input.removeEventListener('blur', remcl);
+                if (input) {
+                    input.removeEventListener('focus', () => addFocusClass(input));
+                    input.removeEventListener('blur', () => removeFocusClass(input));
+                }
             });
         };
     }, []);
@@ -126,11 +155,10 @@ const Login: React.FC = () => {
         setState(prevState => ({ ...prevState, open: false }));
     };
 
-    
     useEffect(() => {
         setTimeout(() => {
             setIsLoading(false);
-        }, 500); 
+        }, 500);
     }, []);
 
     useEffect(() => {
@@ -159,7 +187,7 @@ const Login: React.FC = () => {
                     <form onSubmit={handleLogin} autoComplete="on">
                         <img src={avatarImg} alt="avatar" />
                         <h2 className="title">Welcome</h2>
-                        <div className="input-div one">
+                            <div className={`input-div one ${usernameFocused ? 'focus' : ''}`}>
                             <div className="i">
                                 <i className="fas fa-user"></i>
                             </div>
@@ -170,12 +198,13 @@ const Login: React.FC = () => {
                                     className="input"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    ref={usernameRef}
+                                    onFocus={handleFocus(() => setUsernameFocused(true))}
+                                    onBlur={handleBlur(() => setUsernameFocused(false))}
                                     autoComplete="username"
                                 />
                             </div>
                         </div>
-                        <div className="input-div pass">
+                        <div className={`input-div pass ${passwordFocused ? 'focus' : ''}`}>
                             <div className="i">
                                 <i className="fas fa-lock"></i>
                             </div>
@@ -186,6 +215,8 @@ const Login: React.FC = () => {
                                     className="input"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    onFocus={handleFocus(() => setPasswordFocused(true))}
+                                    onBlur={handleBlur(() => setPasswordFocused(false))}
                                     autoComplete="current-password"
                                 />
                             </div>

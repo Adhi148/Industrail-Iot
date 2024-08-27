@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
-import Dashboard from "./Components/Dashboard/Dashboard";
+import Dashboards from "./Components/Dashboards/Dashboards";
 import Charts from "./Components/Charts/Charts";
 import Actions from "./Components/Actions/Actions";
 import Devices from "./Components/Devices/Devices";
@@ -28,8 +28,8 @@ const Router = createBrowserRouter([
         element: <App />,
         children: [
             {
-                path: '/dashboard',
-                element: <Dashboard />,
+                path: '/dashboards',
+                element: <Dashboards />,
             },
             {
                 path: '/charts',

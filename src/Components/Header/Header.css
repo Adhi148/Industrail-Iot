@@ -3,7 +3,7 @@
     padding: 20px 0px;
     display: flex;
     gap: 25px;
-    background-color: #6c3;
+    background-color: #2BC790;
     box-shadow: 0px 0 10px rgb(31, 89, 2);
     z-index: 200;
     position: relative;
@@ -19,8 +19,8 @@
 }
 .logo{
     width: 275px;
-    color: orangered;
-    font-size: 20px;
+    color: white;
+    font-size: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
