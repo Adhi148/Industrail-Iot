@@ -18,7 +18,11 @@ const Users: React.FC= () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const userData = await getUsers(0);
+                const params = {
+                    pageSize: 16,
+                    page: 0
+                }
+                const userData = await getUsers(params);
                 console.log(userData.data);
                 setUserdata(userData.data);
                 setTimeout(() => {

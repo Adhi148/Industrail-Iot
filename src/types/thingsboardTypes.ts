@@ -1,37 +1,37 @@
 // Device types
 export interface Device {
-  id?: any;
+  id?: {id: string, entityType: string};
   name?: string;
   type?: string;
   label?: string; // Optional: A user-friendly label for the device
   description?: string; // Optional: A description of the device
   credentials?: any; // Optional: Device credentials if applicable
-  tenantId?: string;
-  customerId?: string;
-  additionalInfo?: any;
+  tenantId?: {id: string, entityType: string};
+  customerId?: {id: string, entityType: string};
+  additionalInfo?: Object;
 }
 
 // Device Profile types
 export interface DeviceProfile {
-  id?: string;
+  id?: {id: string, entityType: string};
   name?: string;
   description?: string; // Optional: Description of the device profile
 }
 
 // Dashboard types
 export interface DashboardType {
-  id?: any;
+  id?: {id: string, entityType: string};
   title?: string;
   description?: string; // Optional: Description of the dashboard
   createdTime?: string; // Optional: ISO 8601 format
   updatedTime?: string; // Optional: ISO 8601 format
-  tenantId?: string;
-  customerId?: string;
-  additionalInfo?: any;
+  tenantId?: {id: string, entityType: string};
+  customerId?: {id: string, entityType: string};
+  additionalInfo?: Object;
 }
 
 export interface DashboardInfo {
-  id?: string;
+  id?: {id: string, entityType: string};
   title?: string;
   description?: string;
   createdTime?: string;
@@ -46,23 +46,45 @@ export interface DashboardQueryParams {
   sortOrder?: 'ASC' | 'DESC';
 }
 
-
 // Widget types
 export interface Widget {
-  id?: string;
+  id?: {id: string, entityType: string};
+  name?: string;
   type?: string;
   title?: string; // Optional: Title of the widget
+  bundleAlias?: string;
   configuration?: any; // Optional: Widget-specific configuration
+  isSystemType?: boolean;
 }
 
+// Widget Configuration
 export interface WidgetConfig {
-  id?: string;
+  id?: {id: string, entityType: string};
   type?: string;
   settings?: any; // Optional: Settings for the widget
   layout?: any; // Optional: Layout configuration for the widget
 }
 
-// Query Parameters
+// Widget Bundle types
+export interface WidgetBundle {
+  id?: {id: string, entityType: string};
+  name?: string;
+  alias?: string;
+  description?: string;
+  title?: string;
+  image?: string; // Assuming inline images are base64 encoded strings
+  widgets?: Widget[]; // Optional, can be an array of Widgets
+}
+
+// Interface for WidgetTypeFQN (Fully Qualified Name)
+export interface WidgetTypeFQN {
+  alias?: string;
+  bundleAlias?: string;
+  name?: string;
+  type?: string;
+}
+
+// Device Query Parameters
 export interface DeviceQueryParams {
   pageSize?: number;
   page?: number;
@@ -82,16 +104,29 @@ export interface PageData<T> {
 
 // User types
 export interface User {
-  id?: any;
-  customerId?: any;
-  tenantId?: any;
+  id?: {id: string, entityType: string}
+  customerId?: {id: string, entityType: string};
+  tenantId?: {id: string, entityType: string};
   firstName?: string;
   lastName?: string;
   email?: string;
   name?: string;
   authority?: string;
   additionalInfo?: Object;
-  phone?: string,
+  phone?: string;
+}
+
+// Customer types
+export interface Customer {
+  id?: {id: string, entityType: string}
+  title: string; // Title of the customer
+  address?: string; // Optional: Address of the customer
+  phone?: string; // Optional: Contact phone number for the customer
+  country?: string; // Optional: Country of the customer
+  state?: string; // Optional: State of the customer
+  city?: string; // Optional: City of the customer
+  zip?: string; // Optional: ZIP code of the customer
+  tenantId?: {id: string, entityType: string}; // ID of the tenant the customer belongs to
 }
 
 export interface UserSettings {
@@ -108,30 +143,11 @@ export interface MobileSessionData {
 }
 
 
-// Interface for WidgetBundle
-export interface WidgetBundle {
-  id?: string;
-  name?: string;
-  alias?: string;
-  description?: string;
-  title?: string;
-  image?: string; // Assuming inline images are base64 encoded strings
-  widgets?: Widget[]; // Optional, can be an array of Widgets
-}
 
-// Interface for Widget
-export interface Widget {
-  id?: string;
-  name?: string;
-  type?: string;
-  bundleAlias?: string;
-  isSystemType?: boolean;
-}
 
-// Interface for WidgetTypeFQN (Fully Qualified Name)
-export interface WidgetTypeFQN {
-  alias?: string;
-  bundleAlias?: string;
-  name?: string;
-  type?: string;
+// Tenant types
+export interface Tenant {
+  id?: {id: string, entityType: string};
+  title: string;
+  additionalInfo?: Object;
 }
