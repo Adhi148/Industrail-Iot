@@ -8,6 +8,7 @@ router.post('/addvehicle', async(req, res) => {
     try {
         const newvehicle = new vehicle(req.body);
         await newvehicle.save();
+        res.status(201).send(newvehicle);
     } catch (error) {
         res.status(400).send(error)
     }

@@ -20,12 +20,14 @@ interface WarehouseDimensions {
 interface CoolingUnit {
   coolant: string;
   coolant_used: string;
+  data: string
 }
 
 interface Sensor {
   sensor: string;
   rack_id: number;
   shelf_id: number;
+  data: string
 }
 
 interface WarehouseData {
@@ -54,6 +56,7 @@ const AddWarehouse: React.FC = () => {
     cooling_units: [],
     sensors: [],
   });
+
 
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [coolantOptions, setCoolantOptions] = useState<CoolantOption[]>([]);
@@ -181,6 +184,7 @@ const AddWarehouse: React.FC = () => {
       const formattedData = selectedOptions ? selectedOptions.map((option: { value: string; label: string }) => ({
         coolant: option.value,
         coolant_used: '', // Default empty, can be filled in the input fields
+        data: option.label
       })) : [];
       setFormData({
         ...formData,
@@ -191,6 +195,7 @@ const AddWarehouse: React.FC = () => {
         sensor: option.value,
         rack_id: 0, // Default value
         shelf_id: 0, // Default value
+        data: option.label
       })) : [];
       setFormData({
         ...formData,
@@ -203,6 +208,8 @@ const AddWarehouse: React.FC = () => {
       });
     }
   };
+
+  console.log(formData)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -228,6 +235,8 @@ const AddWarehouse: React.FC = () => {
       console.error('Error submitting form:', error);
     }
   };
+
+ 
 
   return (
     <div className="form-container">
@@ -349,7 +358,7 @@ const AddWarehouse: React.FC = () => {
             />
             {formData.cooling_units.map((coolingUnit, index) => (
               <div key={index}>
-                <label>Coolant Used:</label>
+                <label>Coolant Used: {coolingUnit.data}</label>
                 <input
                   type="text"
                   value={coolingUnit.coolant_used}
@@ -374,7 +383,7 @@ const AddWarehouse: React.FC = () => {
             />
             {formData.sensors.map((sensor, index) => (
               <div key={index}>
-                <label>Enter Rack ID for Sensor </label>
+                <label>Enter Rack ID for Sensor {sensor.data}</label>
                 <input
                   type="number"
                   value={sensor.rack_id}
