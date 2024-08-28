@@ -14,14 +14,15 @@ interface SensorsOption {
 }
 
 interface WarehouseDimensions {
-    length: number;
-    width: number;
-    height: number;
+    length: string;
+    width: string;
+    height: string;
 }
 
 interface CoolingUnit {
     coolant: string;
     coolant_used: string;
+    data : any
 }
 
 interface Sensor {
@@ -33,8 +34,8 @@ interface Sensor {
 interface WarehouseData {
     warehouse_id: string;
     warehouse_name: string;
-    latitude: number;
-    longitude: number;
+    latitude: string;
+    longitude: string;
     warehouse_dimensions: WarehouseDimensions;
     energy_resource: string;
     cooling_units: CoolingUnit[];
@@ -45,12 +46,12 @@ const AddWarehouse: React.FC = () => {
     const [formData, setFormData] = useState<WarehouseData>({
         warehouse_id: '',
         warehouse_name: '',
-        latitude: 0,
-        longitude: 0,
+        latitude: '',
+        longitude: '',
         warehouse_dimensions: {
-            length: 0,
-            width: 0,
-            height: 0,
+            length: '',
+            width: '',
+            height: '',
         },
         energy_resource: '',
         cooling_units: [],
@@ -108,12 +109,12 @@ const AddWarehouse: React.FC = () => {
         setFormData({
             warehouse_id: '',
             warehouse_name: '',
-            latitude: 0,
-            longitude: 0,
+            latitude: '',
+            longitude: '',
             warehouse_dimensions: {
-                length: 0,
-                width: 0,
-                height: 0,
+                length: '',
+                width: '',
+                height: '',
             },
             energy_resource: '',
             cooling_units: [],
@@ -126,8 +127,9 @@ const AddWarehouse: React.FC = () => {
         const { name, value } = e.target;
 
         if (name.startsWith('warehouse_dimensions.') || name === 'latitude' || name === 'longitude') {
-            const parsedValue = parseFloat(value);
-            if (!isNaN(parsedValue)) {
+            // Validate and format number input
+            const parsedValue = value.trim();
+            if (parsedValue === '' || !isNaN(Number(parsedValue))) {
                 if (name.startsWith('warehouse_dimensions.')) {
                     const dimensionKey = name.split('.')[1] as keyof WarehouseDimensions;
                     setFormData({
@@ -151,6 +153,7 @@ const AddWarehouse: React.FC = () => {
             });
         }
     };
+
 
     const handleCoolantChange = (index: number, field: keyof CoolingUnit, value: string) => {
         const updatedCoolingUnits = [...formData.cooling_units];
@@ -182,6 +185,7 @@ const AddWarehouse: React.FC = () => {
         if (name === 'cooling_units') {
             const formattedData = selectedOptions ? selectedOptions.map((option: { value: string; label: string }) => ({
                 coolant: option.value,
+                data: option.label,
                 coolant_used: '', // Default empty, can be filled in the input fields
             })) : [];
             setFormData({
@@ -190,7 +194,7 @@ const AddWarehouse: React.FC = () => {
             });
         } else if (name === 'sensors') {
             const formattedData = selectedOptions ? selectedOptions.map((option: { value: string; label: string }) => ({
-                sensor: option.value,
+                sensor: option.label,
                 rack_id: 0, // Default value
                 shelf_id: 0, // Default value
             })) : [];
@@ -231,6 +235,8 @@ const AddWarehouse: React.FC = () => {
         }
     };
 
+    console.log(formData)
+
     return (
         <div className="menu-data">
             <div className="warehouse">
@@ -270,7 +276,7 @@ const AddWarehouse: React.FC = () => {
                                 <TextField
                                     label="Latitude"
                                     name="latitude"
-                                    type="number"
+                                    type='number'
                                     value={formData.latitude}
                                     onChange={handleChange}
                                     disabled={submitted}
@@ -353,7 +359,7 @@ const AddWarehouse: React.FC = () => {
                             
                             {formData.cooling_units.map((coolingUnit, index) => (
                                 <div key={index}>
-                                    <label>Coolant Used:</label>
+                                    <label>Coolant Used : {coolingUnit.data}</label>
                                     <input
                                         type="text"
                                         value={coolingUnit.coolant_used}
@@ -384,7 +390,7 @@ const AddWarehouse: React.FC = () => {
                             {formData.sensors.map((sensor, index) => (
                                 <div key={index} className="form-group-coolents">
                                     <div>
-                                        <label>Enter Rack ID for Sensor </label>
+                                        <label>Enter Rack ID for Sensor : {sensor.sensor} </label>
                                         <input
                                             type="number"
                                             value={sensor.rack_id}
@@ -396,7 +402,7 @@ const AddWarehouse: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label>Shelf ID:</label>
+                                        <label>Shelf ID : {sensor.sensor}</label>
                                         <input
                                             type="number"
                                             value={sensor.shelf_id}
