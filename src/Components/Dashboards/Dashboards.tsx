@@ -38,7 +38,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleDelete = async (dashboardId: string) => {
+  const handleDelete = async (dashboardId: string = '') => {
     await deleteDashboard(dashboardId)
     setOpen(true);
     fetchDashboards(0)

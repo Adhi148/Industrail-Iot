@@ -63,7 +63,7 @@ export const deleteUser = async (userId: string) => {
 };
 
 // Get Activation Link for User
-export const getActivationLink = async (userId: string) => {
+export const getActivationLink = async (userId: string = '') => {
   const response = await thingsboardAPI.get(`/user/${userId}/activationLink`);
   return response.data;
 };

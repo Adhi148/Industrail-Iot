@@ -148,7 +148,7 @@ export const getDeviceInfoById = async (deviceId: string): Promise<any> => {
 
 // Find related devices
 export const getAllDevices = async (query: any): Promise<any> => {
-  const response = await thingsboardAPI.post('/devices');
+  const response = await thingsboardAPI.post('/devices', query);
   return response.data;
 };
 

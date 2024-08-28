@@ -8,7 +8,7 @@ export const saveTenant = async (tenant: Tenant): Promise<Tenant> => {
 };
 
 // Get Tenant by ID
-export const getTenantById = async (tenantId: string): Promise<Tenant> => {
+export const getTenantById = async (tenantId: string = ''): Promise<Tenant> => {
   const response = await thingsboardAPI.get<Tenant>(`/tenant/${tenantId}`);
   return response.data;
 };
