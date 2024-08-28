@@ -1,3 +1,14 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+}
+
 .wave {
     position: fixed;
     bottom: 0;
@@ -79,7 +90,7 @@ form {
 .input-div>div>h5 {
     position: absolute;
     left: 10px;
-    top: 50%;
+    top: 70%;
     transform: translateY(-50%);
     color: #999;
     font-size: 18px;
@@ -111,7 +122,7 @@ form {
 }
 
 .input-div.focus>div>h5 {
-    top: -12px;
+    top: -8px;
     font-size: 15px;
 }
 
@@ -127,24 +138,11 @@ form {
     height: 100%;
     border: none;
     outline: none;
-    background: transparent;
-    /* Make the background transparent */
+    background: none;
     padding: 0.5rem 0.7rem;
     font-size: 1.2rem;
     color: #555;
-    /* Ensure text color is visible */
-    font-family: 'Poppins', sans-serif;
-    box-shadow: -0px -4px 8px rgba(0, 0, 0, 0.1);
-    /* Shadow on all sides */
-    border-radius: 4px;
-    /* Optional: Add border radius for rounded corners */
-    transition: box-shadow 0.3s ease;
-    /* Smooth transition for box shadow */
-}
-
-.input-div>div>input:focus {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    /* More pronounced shadow on focus */
+    font-family: 'poppins', sans-serif;
 }
 
 .input-div.pass {

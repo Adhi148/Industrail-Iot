@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { getUsers } from "../../api/userApi";
 import PersonIcon from '@mui/icons-material/Person';
 import Loader from "../Loader/Loader";
+import { useDispatch } from "react-redux";
+import { set_usersCount } from "../../Redux/Action/Action";
 
 interface user {
     email: string, 
@@ -14,13 +16,19 @@ const Users: React.FC= () => {
 
     const [userdata, setUserdata] = useState<user[]>([]);
     const [loading, setLoader] = useState(true)
+    const devicecountdispatch = useDispatch();
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const userData = await getUsers(0);
+                const params = {
+                    pageSize: 16,
+                    page: 0
+                }
+                const userData = await getUsers(params);
                 console.log(userData.data);
                 setUserdata(userData.data);
+                devicecountdispatch(set_usersCount(userData.data.length));
                 setTimeout(() => {
                     setLoader(false);
                 }, 1000);

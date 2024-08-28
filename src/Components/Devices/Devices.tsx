@@ -36,6 +36,8 @@ const Devices: React.FC = () => {
             const response: PageData<Device> = await getTenantDevices(params);
             setDevices(response.data || []);
 
+            deviceCountDispatch(set_DeviceCount(response.totalElements || 0));
+
             setTimeout(() => {
                 setLoadingDevices(false);
             }, 1000);
@@ -46,7 +48,7 @@ const Devices: React.FC = () => {
         }
     };
 
-    const handleDelete = async(id: string): Promise<void> =>{
+    const handleDelete = async(id: string = ''): Promise<void> =>{
         await deleteDevice(id);
         handleClick();
         fetchDevices(0);

@@ -1,4 +1,5 @@
-import React, { act, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import './myComponent.css';
 import {
   Device,
   DashboardType,
@@ -6,6 +7,7 @@ import {
   DeviceQueryParams,
   PageData,
   DashboardQueryParams,
+  Customer,
 } from '../../types/thingsboardTypes';
 import { getCurrentUser } from '../../api/loginApi';
 import { getTenantDevices } from '../../api/deviceApi';
@@ -16,15 +18,20 @@ import {
   getWidgetsBundles,
 } from '../../api/widgetsBundleAPI';
 import { getDeviceProfileNames } from '../../api/deviceProfileAPIs';
+import {
+  createOrUpdateCustomer,
+  getCustomers,
+  getTenantCustomerByTitle,
+} from '../../api/customerAPI';
+import { getTenantById } from '../../api/tenantAPI';
 
 const MyComponent: React.FC = () => {
-
   // State for dashboard creation
   const [dashboardTitle, setDashboardTitle] = useState<string>('');
   const [dashboardError, setDashboardError] = useState<string | null>(null);
 
-
-  const [sendActivationMail, setSendActivationMail] = useState<boolean>(true);
+  const [IsSendActivationMail, setIsSendActivationMail] =
+    useState<boolean>(false);
   const [userError, setUserError] = useState<string | null>(null);
 
   // State for devices
@@ -48,6 +55,11 @@ const MyComponent: React.FC = () => {
 
   const [deviceProfileNames, setDeviceProfileNames] = useState<any[]>([]);
 
+  const [title, setTitle] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+
+  const [tenant, setTenant] = useState<User | null>(null);
+
   // Fetch widget bundles with parameters
   const fetchAllWidgetBundles = async () => {
     try {
@@ -65,16 +77,20 @@ const MyComponent: React.FC = () => {
   const fetchWidgetBundles = async (page: number) => {
     try {
       setLoadingWidgetBundles(true);
-      const response = await getWidgetsBundles(10, page);
+      const params = {
+        pageSize: 10,
+        page: page,
+      };
+      const response = await getWidgetsBundles(params);
       setWidgetBundles(response.data || []);
       setTotalWidgetPages(response.totalPages ?? 0);
+      // console.log(response.data)
     } catch (error) {
       console.error('Failed to fetch widget bundles', error);
     } finally {
       setLoadingWidgetBundles(false);
     }
   };
-
 
   // Handle dashboard creation
   const handleCreateDashboard = async () => {
@@ -94,18 +110,21 @@ const MyComponent: React.FC = () => {
   // Handle user creation
   const handleCreateUser = async () => {
     try {
+      const currentuser: User = await getCurrentUser();
+      const tenant = await getTenantById(currentuser.tenantId?.id);
+      setTenant(tenant);
       const newUser: User = {
-        email: 'user9@example.com',
+        email: email,
         authority: 'TENANT_ADMIN',
-        firstName: 'John',
-        lastName: 'Doe',
-        phone: '38012345123',
+        firstName: '',
+        lastName: '',
+        phone: '',
         additionalInfo: {},
       };
-      const user = await saveUser(newUser, false);
-      console.log(user)
-      const activationlink = await getActivationLink(user.id.id)
-      console.log(activationlink)
+      const user = await saveUser(newUser, IsSendActivationMail);
+      console.log(user);
+      const activationlink = await getActivationLink(user.id?.id);
+      console.log(activationlink);
       alert('User created successfully!');
       fetchUsers(0);
     } catch (error: any) {
@@ -172,12 +191,16 @@ const MyComponent: React.FC = () => {
 
   // Fetch users
   const fetchUsers = async (page: number) => {
+    setUserError(null);
     try {
       setLoadingUsers(true);
-      const response: PageData<User> = await getUsers(page);
+      const params = {
+        pageSize: 10,
+        page: page,
+      };
+      const response: PageData<User> = await getUsers(params);
 
       setUsers(response.data || []);
-      // console.log(response.data)
     } catch (error) {
       console.error('Failed to fetch users', error);
       setUserError('Failed to fetch users');
@@ -186,6 +209,20 @@ const MyComponent: React.FC = () => {
     }
   };
 
+  // Fetch Customers
+  const fetchCustomers = async (page: number) => {
+    try {
+      const params = {
+        pageSize: 10,
+        page: page,
+      };
+      const response: PageData<Customer> = await getCustomers(params);
+
+      setUsers(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch users', error);
+    }
+  };
   const handleGetAll = async () => {
     fetchDevices(0);
     fetchDashboards(0);
@@ -194,11 +231,56 @@ const MyComponent: React.FC = () => {
     fetchWidgetBundles(currentWidgetPage);
     fetchDeviceProfileNames(false);
     const response = await getCurrentUser();
-    console.log(response);
+    console.log('Current User: \n', response);
+    fetchCustomers(0);
   };
 
   const handlePageChangeWidgets = (page: number) => {
-    setCurrentWidgetPage(page < totalWidgetPages ? page : totalWidgetPages);
+    if (page >= 0 && page < totalWidgetPages) {
+      setCurrentWidgetPage(page);
+    }
+  };
+
+  const handleCustomerSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    try {
+      const cust: Customer = {
+        title: title,
+      };
+
+      const currentuser: User = await getCurrentUser();
+
+      let customer = undefined;
+      try {
+        customer = await createOrUpdateCustomer(cust);
+      } catch (error) {
+        customer = await getTenantCustomerByTitle(title);
+      }
+      const newUser: User = {
+        authority: 'CUSTOMER_USER',
+        email: email,
+        firstName: '',
+        lastName: '',
+        phone: '',
+        additionalInfo: {},
+        customerId: {
+          id: customer.id?.id || '',
+          entityType: 'CUSTOMER',
+        },
+        tenantId: {
+          id: currentuser.id?.id || '',
+          entityType: 'TENANT',
+        },
+      };
+      const user: User = await saveUser(newUser, false);
+      console.log(user);
+      const activationlink = await getActivationLink(user.id?.id);
+      console.log(activationlink);
+      alert('Customer created successfully!');
+      fetchUsers(0);
+    } catch (error: any) {
+      console.error('Failed to create customer: ' + error.message); // Display error message
+    }
   };
 
   useEffect(() => {
@@ -215,7 +297,7 @@ const MyComponent: React.FC = () => {
   }, [currentWidgetPage]);
 
   return (
-    <div className="menu-data" style={{ padding: '10px' }}>
+    <div className="menu-data mycomponent">
       <h1>MyComponent</h1>
       <button onClick={handleGetAll}>Get Data</button>
 
@@ -234,17 +316,61 @@ const MyComponent: React.FC = () => {
 
       {/* Create User */}
       <div>
-        <h2>Create User</h2>
+        <h2>Create Tenant User</h2>
+        <input
+          type="text"
+          placeholder="Tenant"
+          value={tenant ? tenant.name : ''}
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
+        />
         <label>
           <input
             type="checkbox"
-            checked={sendActivationMail}
-            onChange={(e) => setSendActivationMail(e.target.checked)}
+            checked={IsSendActivationMail}
+            onChange={(e) => setIsSendActivationMail(e.target.checked)}
           />
           Send Activation Mail
         </label>
         <button onClick={handleCreateUser}>Create User</button>
         {userError && <p>{userError}</p>}
+      </div>
+
+      <div>
+        <h2>Create Customer User</h2>
+        <form onSubmit={handleCustomerSubmit}>
+          <input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setTitle(e.target.value)
+            }
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
+          />
+          <label>
+            <input
+              type="checkbox"
+              checked={IsSendActivationMail}
+              onChange={(e) => setIsSendActivationMail(e.target.checked)}
+            />
+            Send Activation Mail
+          </label>
+          <button type="submit">Save Customer</button>
+        </form>
       </div>
 
       {/* Devices List */}
@@ -279,8 +405,8 @@ const MyComponent: React.FC = () => {
           <p>Loading dashboards...</p>
         ) : (
           <ul>
-            {dashboards.map((dashboard) => (
-              <li key={dashboard.id.id}>{dashboard.title}</li>
+            {dashboards.map((dashboard, index) => (
+              <li key={index}>{dashboard.title}</li>
             ))}
           </ul>
         )}
@@ -291,7 +417,7 @@ const MyComponent: React.FC = () => {
         <h2>Users</h2>
         {loadingUsers ? (
           <p>Loading users...</p>
-        ) : (
+        ) : users.length > 0 ? (
           <ul>
             {users.map((user) => (
               <li key={user.id?.id}>
@@ -299,6 +425,8 @@ const MyComponent: React.FC = () => {
               </li>
             ))}
           </ul>
+        ) : (
+          <p>No users found.</p>
         )}
       </div>
 
