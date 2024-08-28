@@ -88,7 +88,7 @@ const Login: React.FC = () => {
                 // Hide the success message after 1 second
                 setTimeout(() => {
                     setState(prevState => ({ ...prevState, open: false }));
-                    navigate('/dashboard', { state: username });
+                    navigate('/dashboards', { state: username });
                 }, 500);
             }, 1000); 
 

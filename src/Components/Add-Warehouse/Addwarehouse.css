@@ -89,14 +89,10 @@
     height:50px;
     background-color: #ebebeb;
 }
-/* Example CSS to maintain consistent height */
 #cooling_units .select__control {
     height: 40px !important;
-    /* Ensure a consistent height */
     padding: 0;
-    /* Adjust padding if needed */
     box-sizing: border-box;
-    /* Ensure the padding doesn't affect height */
 }
 .css-13cymwt-control{
     height: 60px;
@@ -118,5 +114,5 @@
     background-color: #ebebeb;
 }
 .sensors-coolent{
-    margin-top:30px !important;
+    margin-top:15px !important;
 }

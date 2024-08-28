@@ -12,28 +12,27 @@ const App = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const accesstoken = useSelector((state: any) => state.user.accesstoken);
-  const nodeRef = useRef(null); // Add a ref for CSSTransition
+  const nodeRef = useRef(null);
 
   useEffect(() => {
-    const validateToken = async () => {
+    const validateToken = () => {
       const token = localStorage.getItem('token');
-      console.log(token);
 
-      if (!token || accesstoken !== token) {
+      if (!token || token !== accesstoken) {
         navigate('/login');
       } else {
-        navigate('/dashboard');
+        setLoading(false); 
       }
     };
 
-    validateToken().finally(() => setLoading(false));
+    validateToken();
   }, [navigate, accesstoken]);
 
   useEffect(() => {
     let lastActivity = Date.now();
     const checkActivity = () => {
       const now = Date.now();
-      if (now - lastActivity > 600000) {
+      if (now - lastActivity > 600000) { 
         localStorage.clear();
         navigate('/login');
       }
@@ -49,25 +48,12 @@ const App = () => {
 
     const intervalId = setInterval(checkActivity, 60000);
 
-
     return () => {
       window.removeEventListener('click', handleActivity);
       window.removeEventListener('keydown', handleActivity);
       window.removeEventListener('mousemove', handleActivity);
       clearInterval(intervalId);
     };
-  }, [navigate]);
-
-  useEffect(() => {
-    const currentPath = location.pathname;
-    sessionStorage.setItem('lastPath', currentPath);
-  }, [location]);
-
-  useEffect(() => {
-    const lastPath = sessionStorage.getItem('lastPath');
-    if (lastPath) {
-      navigate(lastPath);
-    }
   }, [navigate]);
 
   if (loading) {

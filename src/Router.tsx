@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "./App";
 import Dashboards from "./Components/Dashboards/Dashboards";
 import Charts from "./Components/Charts/Charts";
 import Actions from "./Components/Actions/Actions";
@@ -17,6 +16,7 @@ import Addvehicle from "./Components/Add-Vehicle/Addvehicle";
 import MyComponent from "./Components/MyComponent/MyComponent";
 import Login from "./Components/Login/Login";
 import Accountinfo from "./Components/AccountInfo/Accountinfo";
+import App from "./App";
 
 const Router = createBrowserRouter([
     {
