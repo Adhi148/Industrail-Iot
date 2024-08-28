@@ -26,7 +26,6 @@ const Users: React.FC= () => {
                     page: 0
                 }
                 const userData = await getUsers(params);
-                console.log(userData.data);
                 setUserdata(userData.data);
                 devicecountdispatch(set_usersCount(userData.data.length));
                 setTimeout(() => {
@@ -39,6 +38,7 @@ const Users: React.FC= () => {
 
         fetchUserData();
     }, []);
+
 
 
 
@@ -62,7 +62,7 @@ const Users: React.FC= () => {
                                     </div>
                                     <div className="status">
                                         <p className="username">{key.email}</p>
-                                        <p>{formatDate(key.additionalInfo.lastLoginTs)}</p>
+                                        <p>{key.additionalInfo.lastLoginTs ? formatDate(key.additionalInfo.lastLoginTs) : "No Login Found"}</p>
                                     </div>
                                 </div>
                             </div>
