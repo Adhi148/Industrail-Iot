@@ -15,6 +15,7 @@ router.post('/addcoolant', async(req, res) =>{
     }
 });
 
+// get all coolants
 router.get('/getallcoolants', async(req, res) => {
     try {
         const allcoolants = await coolant.find();
@@ -24,6 +25,7 @@ router.get('/getallcoolants', async(req, res) => {
     }
 });
 
+// get avaliable sensors, which are not in use
 router.get('/getavaliablecoolants', async(req, res) => {
     try {
         const allcoolants = await coolant.find();
@@ -52,6 +54,6 @@ router.get('/getavaliablecoolants', async(req, res) => {
     } catch (error) {
         res.status(400).send({ message: 'Error retrieving available coolants', error });
     }
-})
+});
 
 export default router

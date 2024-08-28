@@ -8,6 +8,7 @@ router.post('/addvehicle', async(req, res) => {
     try {
         const newvehicle = new vehicle(req.body);
         await newvehicle.save();
+        res.status(201).send(newvehicle);
     } catch (error) {
         res.status(400).send(error)
     }
@@ -39,7 +40,23 @@ router.get('/getallvehicle', async(req, res) => {
 // get vehicle by vehicle_id
 router.get('/getbyvehicleid/:vehicle_id', async(req, res) => {
     try {
-        const {vehicle_id} = req.para
+        const {vehicle_id} = req.params;
+        const vehicleData = await vehicle.findOne({ vehicle_id })
+        .populate({
+            path: 'cooling_units.coolant',
+            select: 'coolant_id location_in_warehouse'
+        })
+        .populate({
+            path: 'sensors.sensor',
+            select: 'sensor_id indoor_location Type date_of_installation'
+        })
+        .exec();
+
+        if (!vehicleData) {
+            return res.status(404).json({ message: 'Vehicle not found' });
+        }
+
+        res.json(vehicleData);
     } catch (error) {
         console.error("Error fetching vehicle:", error);
         res.status(500).json({ message: 'Internal Server Error' });
