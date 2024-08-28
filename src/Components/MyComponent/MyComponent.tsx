@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import './myComponent.css'
+import './myComponent.css';
 import {
   Device,
   DashboardType,
@@ -18,14 +18,20 @@ import {
   getWidgetsBundles,
 } from '../../api/widgetsBundleAPI';
 import { getDeviceProfileNames } from '../../api/deviceProfileAPIs';
-import { createOrUpdateCustomer, getCustomers, getTenantCustomerByTitle } from '../../api/customerAPI';
+import {
+  createOrUpdateCustomer,
+  getCustomers,
+  getTenantCustomerByTitle,
+} from '../../api/customerAPI';
+import { getTenantById } from '../../api/tenantAPI';
 
 const MyComponent: React.FC = () => {
   // State for dashboard creation
   const [dashboardTitle, setDashboardTitle] = useState<string>('');
   const [dashboardError, setDashboardError] = useState<string | null>(null);
 
-  const [sendActivationMail, setSendActivationMail] = useState<boolean>(false);
+  const [IsSendActivationMail, setIsSendActivationMail] =
+    useState<boolean>(false);
   const [userError, setUserError] = useState<string | null>(null);
 
   // State for devices
@@ -51,6 +57,8 @@ const MyComponent: React.FC = () => {
 
   const [title, setTitle] = useState<string>('');
   const [email, setEmail] = useState<string>('');
+
+  const [tenant, setTenant] = useState<User | null>(null);
 
   // Fetch widget bundles with parameters
   const fetchAllWidgetBundles = async () => {
@@ -102,6 +110,9 @@ const MyComponent: React.FC = () => {
   // Handle user creation
   const handleCreateUser = async () => {
     try {
+      const currentuser: User = await getCurrentUser();
+      const tenant = await getTenantById(currentuser.tenantId?.id);
+      setTenant(tenant);
       const newUser: User = {
         email: email,
         authority: 'TENANT_ADMIN',
@@ -110,9 +121,9 @@ const MyComponent: React.FC = () => {
         phone: '',
         additionalInfo: {},
       };
-      const user = await saveUser(newUser, sendActivationMail);
+      const user = await saveUser(newUser, IsSendActivationMail);
       console.log(user);
-      const activationlink = await getActivationLink(user.id.id);
+      const activationlink = await getActivationLink(user.id?.id);
       console.log(activationlink);
       alert('User created successfully!');
       fetchUsers(0);
@@ -180,6 +191,7 @@ const MyComponent: React.FC = () => {
 
   // Fetch users
   const fetchUsers = async (page: number) => {
+    setUserError(null);
     try {
       setLoadingUsers(true);
       const params = {
@@ -207,7 +219,6 @@ const MyComponent: React.FC = () => {
       const response: PageData<Customer> = await getCustomers(params);
 
       setUsers(response.data || []);
-      console.log(response.data);
     } catch (error) {
       console.error('Failed to fetch users', error);
     }
@@ -220,12 +231,14 @@ const MyComponent: React.FC = () => {
     fetchWidgetBundles(currentWidgetPage);
     fetchDeviceProfileNames(false);
     const response = await getCurrentUser();
-    console.log(response);
+    console.log('Current User: \n', response);
     fetchCustomers(0);
   };
 
   const handlePageChangeWidgets = (page: number) => {
-    setCurrentWidgetPage(page < totalWidgetPages ? page : totalWidgetPages);
+    if (page >= 0 && page < totalWidgetPages) {
+      setCurrentWidgetPage(page);
+    }
   };
 
   const handleCustomerSubmit = async (event: FormEvent) => {
@@ -241,7 +254,7 @@ const MyComponent: React.FC = () => {
       try {
         customer = await createOrUpdateCustomer(cust);
       } catch (error) {
-        customer = await getTenantCustomerByTitle(title)
+        customer = await getTenantCustomerByTitle(title);
       }
       const newUser: User = {
         authority: 'CUSTOMER_USER',
@@ -251,17 +264,17 @@ const MyComponent: React.FC = () => {
         phone: '',
         additionalInfo: {},
         customerId: {
-          id: customer.id?.id,
+          id: customer.id?.id || '',
           entityType: 'CUSTOMER',
         },
         tenantId: {
-          id: currentuser.id?.id,
+          id: currentuser.id?.id || '',
           entityType: 'TENANT',
         },
       };
       const user: User = await saveUser(newUser, false);
       console.log(user);
-      const activationlink = await getActivationLink(user.id.id);
+      const activationlink = await getActivationLink(user.id?.id);
       console.log(activationlink);
       alert('Customer created successfully!');
       fetchUsers(0);
@@ -305,6 +318,11 @@ const MyComponent: React.FC = () => {
       <div>
         <h2>Create Tenant User</h2>
         <input
+          type="text"
+          placeholder="Tenant"
+          value={tenant ? tenant.name : ''}
+        />
+        <input
           type="email"
           placeholder="Email"
           value={email}
@@ -315,8 +333,8 @@ const MyComponent: React.FC = () => {
         <label>
           <input
             type="checkbox"
-            checked={sendActivationMail}
-            onChange={(e) => setSendActivationMail(e.target.checked)}
+            checked={IsSendActivationMail}
+            onChange={(e) => setIsSendActivationMail(e.target.checked)}
           />
           Send Activation Mail
         </label>
@@ -346,8 +364,8 @@ const MyComponent: React.FC = () => {
           <label>
             <input
               type="checkbox"
-              checked={sendActivationMail}
-              onChange={(e) => setSendActivationMail(e.target.checked)}
+              checked={IsSendActivationMail}
+              onChange={(e) => setIsSendActivationMail(e.target.checked)}
             />
             Send Activation Mail
           </label>
@@ -387,8 +405,8 @@ const MyComponent: React.FC = () => {
           <p>Loading dashboards...</p>
         ) : (
           <ul>
-            {dashboards.map((dashboard) => (
-              <li key={dashboard.id.id}>{dashboard.title}</li>
+            {dashboards.map((dashboard, index) => (
+              <li key={index}>{dashboard.title}</li>
             ))}
           </ul>
         )}
@@ -399,7 +417,7 @@ const MyComponent: React.FC = () => {
         <h2>Users</h2>
         {loadingUsers ? (
           <p>Loading users...</p>
-        ) : (
+        ) : users.length > 0 ? (
           <ul>
             {users.map((user) => (
               <li key={user.id?.id}>
@@ -407,6 +425,8 @@ const MyComponent: React.FC = () => {
               </li>
             ))}
           </ul>
+        ) : (
+          <p>No users found.</p>
         )}
       </div>
 

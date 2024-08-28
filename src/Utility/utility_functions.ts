@@ -1,5 +1,5 @@
-import { v1 as uuidv1 } from 'uuid';
+// import { v1 as uuidv1 } from 'uuid';
 
-export const generateUUIDv1 = () => {
-  return uuidv1();
-};
+// export const generateUUIDv1 = () => {
+//   return uuidv1();
+// };

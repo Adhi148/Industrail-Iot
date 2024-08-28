@@ -5,31 +5,18 @@ import thingsboardAPI from './thingsboardAPI';
 export const saveWidgetsBundle = async (
   bundle: WidgetBundle
 ): Promise<WidgetBundle> => {
-  try {
-    const response = await thingsboardAPI.post<WidgetBundle>(
-      '/widgetsBundle',
-      bundle
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error saving widget bundle:', error);
-    throw error;
-  }
+  const response = await thingsboardAPI.post<WidgetBundle>(
+    '/widgetsBundle',
+    bundle
+  );
+  return response.data;
 };
 
 // Delete Widget Bundle
 export const deleteWidgetsBundle = async (
   widgetsBundleId: string
 ): Promise<void> => {
-  try {
-    await thingsboardAPI.delete(`/widgetsBundle/${widgetsBundleId}`);
-  } catch (error) {
-    console.error(
-      `Error deleting widget bundle with ID ${widgetsBundleId}:`,
-      error
-    );
-    throw error;
-  }
+  await thingsboardAPI.delete(`/widgetsBundle/${widgetsBundleId}`);
 };
 
 // Get Widget Bundle by ID
@@ -37,21 +24,13 @@ export const getWidgetsBundleById = async (
   widgetsBundleId: string,
   inlineImages?: boolean
 ): Promise<WidgetBundle> => {
-  try {
-    const response = await thingsboardAPI.get<WidgetBundle>(
-      `/widgetsBundle/${widgetsBundleId}`,
-      {
-        params: { inlineImages },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error(
-      `Error fetching widget bundle with ID ${widgetsBundleId}:`,
-      error
-    );
-    throw error;
-  }
+  const response = await thingsboardAPI.get<WidgetBundle>(
+    `/widgetsBundle/${widgetsBundleId}`,
+    {
+      params: { inlineImages },
+    }
+  );
+  return response.data;
 };
 
 // Update Widgets Bundle Widgets List from Widget Type FQNs
@@ -59,18 +38,10 @@ export const updateWidgetsBundleWidgetFqns = async (
   widgetsBundleId: string,
   widgetTypeFqns: string[]
 ): Promise<void> => {
-  try {
-    await thingsboardAPI.post(
-      `/widgetsBundle/${widgetsBundleId}/widgetTypeFqns`,
-      widgetTypeFqns
-    );
-  } catch (error) {
-    console.error(
-      `Error updating widget type FQNs for bundle with ID ${widgetsBundleId}:`,
-      error
-    );
-    throw error;
-  }
+  await thingsboardAPI.post(
+    `/widgetsBundle/${widgetsBundleId}/widgetTypeFqns`,
+    widgetTypeFqns
+  );
 };
 
 // Update Widgets Bundle Widgets Types List
@@ -78,31 +49,18 @@ export const updateWidgetsBundleWidgetTypes = async (
   widgetsBundleId: string,
   widgetTypes: Widget[]
 ): Promise<void> => {
-  try {
-    await thingsboardAPI.post(
-      `/widgetsBundle/${widgetsBundleId}/widgetTypes`,
-      widgetTypes
-    );
-  } catch (error) {
-    console.error(
-      `Error updating widget types for bundle with ID ${widgetsBundleId}:`,
-      error
-    );
-    throw error;
-  }
+  await thingsboardAPI.post(
+    `/widgetsBundle/${widgetsBundleId}/widgetTypes`,
+    widgetTypes
+  );
 };
 
 // Get All Widget Bundles (without pagination, sorting, and search)
 export const getAllWidgetsBundles = async (): Promise<WidgetBundle[]> => {
-  try {
-    const response = await thingsboardAPI.get<WidgetBundle[]>(
-      '/widgetsBundles'
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching all widget bundles:', error);
-    throw error;
-  }
+  const response = await thingsboardAPI.get<WidgetBundle[]>(
+    '/widgetsBundles'
+  );
+  return response.data;
 };
 
 // Get Widget Bundles (Paginated, Sorted, Searchable)
@@ -115,16 +73,11 @@ export const getWidgetsBundles = async (params: {
   tenantOnly?: boolean;
   fullSearch?: boolean;
 }): Promise<PageData<WidgetBundle>> => {
-  try {
-    const response = await thingsboardAPI.get<PageData<WidgetBundle>>(
-      '/widgetsBundles',
-      {
-        params,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching widget bundles:', error);
-    throw error;
-  }
+  const response = await thingsboardAPI.get<PageData<WidgetBundle>>(
+    '/widgetsBundles',
+    {
+      params,
+    }
+  );
+  return response.data;
 };

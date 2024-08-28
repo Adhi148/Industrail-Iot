@@ -48,7 +48,7 @@ const Devices: React.FC = () => {
         }
     };
 
-    const handleDelete = async(id: string): Promise<void> =>{
+    const handleDelete = async(id: string = ''): Promise<void> =>{
         await deleteDevice(id);
         handleClick();
         fetchDevices(0);

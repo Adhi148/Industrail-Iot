@@ -16,7 +16,11 @@ import Addvehicle from "./Components/Add-Vehicle/Addvehicle";
 import MyComponent from "./Components/MyComponent/MyComponent";
 import Login from "./Components/Login/Login";
 import Accountinfo from "./Components/AccountInfo/Accountinfo";
+
+import Dashboard from "./Components/Dashboard/Dashboard";
+
 import App from "./App";
+
 
 const Router = createBrowserRouter([
     {
@@ -27,6 +31,10 @@ const Router = createBrowserRouter([
         path: '/',
         element: <App />,
         children: [
+            {
+                path: '/dashboard',
+                element: <Dashboard />,
+            },
             {
                 path: '/dashboards',
                 element: <Dashboards />,
