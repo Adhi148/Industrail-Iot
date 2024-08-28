@@ -16,6 +16,7 @@ router.post('/addsensor', async(req, res) => {
     }
 })
 
+// get all sensors
 router.get('/getallsensors', async(req, res) => {
     try {
         const allsensors = await sensor.find();
@@ -25,6 +26,7 @@ router.get('/getallsensors', async(req, res) => {
     }
 });
 
+// get avaliable sensors , which are not in use
 router.get('/getavaliablesensors', async(req, res) => {
     try {
         const allsensors = await sensor.find();
@@ -52,6 +54,6 @@ router.get('/getavaliablesensors', async(req, res) => {
     } catch (error) {
         res.status(400).send({ message: 'Error retrieving available sensors', error });
     }
-})
+});
 
 export default router;
